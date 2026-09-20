@@ -27,19 +27,19 @@ Ganz links liegt eine schmale Leiste mit sieben Symbolen, gegliedert in drei Gru
 
 **Post** — was sich bei jedem Beitrag ändert
 
-- *Creation*: Auswahl der Bausteine und die Texte des Posts
+- *Erstellen*: Auswahl der Bausteine und die Texte des Posts
 - *Export*: Formatauswahl für das ZIP-Archiv und die Exportschaltflächen
 
 **Design** — wie es aussieht
 
 - *Template*: Layout wählen, Platzhalter ansehen, Typografie zuordnen
-- *Font set*: Schriftvarianten anlegen und ihre Achsen einstellen
-- *Colour set*: Farbwerte und ihre Zuweisung
+- *Font-Set*: Schriftvarianten anlegen und ihre Achsen einstellen
+- *Farbset*: Farbwerte und ihre Zuweisung
 
-**Brand** — was selten wechselt
+**Marke** — was selten wechselt
 
-- *Products*: Produkte mit Titel, Slogan und Logo
-- *Company*: Unternehmensangaben und Firmenlogo
+- *Produkte*: Produkte mit Titel, Slogan und Logo
+- *Unternehmen*: Unternehmensangaben und Firmenlogo
 
 ## Vorschaubereich
 
@@ -83,4 +83,4 @@ In den oberen Ecken der Vorschau stehen zwei Anzeigen. Links die Pixelgröße de
 
 ## Exportleiste
 
-Unten stehen links die Versionsnummer und Verweise auf Projektseite, Handbuch und Lizenz, rechts die beiden Exportschaltflächen. Während eines ZIP-Exports erscheint im Bereich *Export* der Seitenleiste ein Fortschrittsbalken.
+Unten stehen links die Versionsnummer und Verweise auf Projektseite, Handbuch und Lizenz, rechts die beiden Exportschaltflächen **PNG (`*Format*`)** und **ZIP (alle Formate)**. Während eines ZIP-Exports erscheint im Bereich *Export* der Seitenleiste ein Fortschrittsbalken.

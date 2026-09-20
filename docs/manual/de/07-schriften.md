@@ -38,7 +38,7 @@ Eine Variation trägt bewusst **weder Strichstärke noch Größe**. Beides ist H
 
 | Was | Wo eingestellt |
 | --- | --- |
-| Familie und Achsenwerte | Bereich *Font set*, je Variation |
+| Familie und Achsenwerte | Bereich *Font-Set*, je Variation |
 | Welche Variation und Strichstärke ein Platzhalter benutzt | Bereich *Template*, je Platzhalter |
 | Größe, einschließlich der Abstufung je Format | CSS des Templates |
 
@@ -49,7 +49,7 @@ Eine globale Strichstärke würde die Abstufung, die ein Template aufbaut, entwe
 
 ## Sets verwalten
 
-**Duplicate** kopiert das bearbeitete Font-Set samt seiner Variationen. Dadurch bleibt die Zuordnung der Platzhalter über Sets hinweg funktionsfähig.
+**Duplizieren** kopiert das bearbeitete Font-Set samt seiner Variationen. Genau wie bei Farbsets stehen auch hier **In der Vorschau zeigen** (bzw. **In der Vorschau aktiv**), **Zurücksetzen** und **Löschen** zur Verfügung. Über **+ Hinzufügen** legen Sie innerhalb eines Sets weitere Variationen an. Dadurch bleibt die Zuordnung der Platzhalter über Sets hinweg funktionsfähig.
 
 Jedes Font-Set behält eine Variation namens *Default* — auch ein dupliziertes. So läuft die Zuordnung eines Platzhalters nie ins Leere.
 

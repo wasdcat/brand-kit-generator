@@ -1,39 +1,39 @@
 # Einen Post erstellen
 
-Der Bereich *Creation* ist der Arbeitsplatz für den Alltag. Er besteht aus zwei Blöcken: oben die Auswahl der Bausteine, darunter die Texte.
+Der Bereich *Erstellen* ist der Arbeitsplatz für den Alltag. Er besteht aus zwei Blöcken: oben die Auswahl der Bausteine, darunter die Texte.
 
 ## Auswahl
 
-Vier Auswahlfelder, jedes mit einem Verweis *Edit →*, der direkt in den zugehörigen Bereich springt:
+Vier Auswahlfelder, jedes mit einem Verweis *Bearbeiten →*, der direkt in den zugehörigen Bereich springt:
 
 | Feld | Wählt |
 | --- | --- |
-| **Product** | Welche Marke oder Sendung |
+| **Produkt** | Welche Marke oder Sendung |
 | **Template** | Welches Layout |
-| **Font set** | Welche Schriftvarianten |
-| **Colour set** | Welche Farben |
+| **Font-Set** | Welche Schriftvarianten |
+| **Farbset** | Welche Farben |
 
 Unter dem Farbset-Feld stehen die sieben Farben des gewählten Sets als kleine Streifen. Ein schneller Blick, ob Sie das richtige erwischt haben.
 
 Die vier Felder sind voneinander unabhängig. Ein Wechsel beim Farbset lässt Template, Produkt und Texte unberührt.
 
-## Inhalt
+## Inhalt dieses Posts
 
 Fünf Felder für den konkreten Beitrag:
 
-- **Title** — die Hauptaussage. Über dem Feld steht die Zeichenzahl.
-- **Subtitle** — zweite Ebene, etwa ein Gast oder ein Untertitel
-- **Description** — Fließtext, die kleinste Textebene
+- **Titel** — die Hauptaussage. Über dem Feld steht die Zeichenzahl.
+- **Untertitel** — zweite Ebene, etwa ein Gast oder ein Untertitel
+- **Beschreibung** — Fließtext, die kleinste Textebene
 - **Tag 1** und **Tag 2** — kurze Marken, meist in Versalien, als farbige Chips dargestellt
 
-### „not used in the template"
+### „im Template nicht verwendet“
 
-Neben einem Feld kann in Orange *not used in the template* stehen. Das heißt: Das aktuell gewählte Template hat für diesen Wert keinen Platz vorgesehen. Sie können trotzdem etwas eintragen — es wird nur nicht angezeigt.
+Neben einem Feld kann in Orange *im Template nicht verwendet* (oder bei Tags *nicht im Template*) stehen. Das heißt: Das aktuell gewählte Template hat für diesen Wert keinen Platz vorgesehen. Sie können trotzdem etwas eintragen — es wird nur nicht angezeigt.
 
 Das ist kein Fehler, sondern Absicht. Ein Lower Third für Video zeigt Titel und Tag; eine Titelkarte für einen Feed-Post hat zusätzlich Platz für Untertitel und Beschreibung. Der eingetragene Text bleibt erhalten und taucht wieder auf, sobald Sie ein Template wählen, das ihn verwendet.
 
 > [!TIP] Welche Felder ein Template nutzt
-> Der Bereich *Template* zeigt unter *Placeholders in this template* alle Platzhalter. Die hervorgehobenen werden verwendet, die blassen nicht.
+> Der Bereich *Template* zeigt unter *Platzhalter in diesem Template* alle Platzhalter. Die hervorgehobenen werden verwendet, die blassen nicht.
 
 ### Leere Felder verschwinden
 

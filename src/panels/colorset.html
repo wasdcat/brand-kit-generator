@@ -115,7 +115,7 @@
     <div v-if="editingColorSet.assign" class="space-y-2">
       <span class="text-[11px] font-bold text-ui-300 block">{{ t('cs.assignment') }}</span>
       <p class="text-[10px] text-ui-500 leading-relaxed">
-        Which of the colours above a design object uses &ndash; no extra colour, just a reference.
+        {{ t('cs.assignmentNote') }}
       </p>
       <div
         v-for="item in COLOR_ASSIGNMENTS"
@@ -145,7 +145,6 @@
   </div>
 
   <p class="text-[10px] text-ui-500 leading-relaxed px-1">
-    A colour set defines the colour values and maps them to individual design objects.
-    Everything else is decided by the CSS of the template.
+    {{ t('cs.note') }}
   </p>
 </div>

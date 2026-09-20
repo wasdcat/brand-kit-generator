@@ -2,7 +2,7 @@
 
 ## Die Vorschau bleibt leer und meldet einen Fehler
 
-**Meldung:** *The template could not be rendered*
+**Meldung:** *Das Template konnte nicht gerendert werden*
 
 **Häufigste Ursache:** Die Datei wurde per Doppelklick geöffnet, die Adresszeile beginnt mit `file://`. Browser verweigern in diesem Fall das Nachladen der Template-Dateien.
 
@@ -48,17 +48,17 @@ Das ist gewollt, wenn das Template die Zeilenzahl begrenzt. Der überstehende Te
 
 Bearbeiten und Anzeigen sind getrennt. Sie bearbeiten möglicherweise ein anderes Set als das, welches die Vorschau zeigt.
 
-**Lösung:** Im Bereich *Colour set* auf **Show in preview** klicken. Steht dort bereits *Active in preview*, bearbeiten Sie das richtige Set — dann nutzt das Template die geänderte Rolle an dieser Stelle schlicht nicht.
+**Lösung:** Im Bereich *Farbset* auf **In der Vorschau zeigen** klicken. Steht dort bereits *In der Vorschau aktiv*, bearbeiten Sie das richtige Set — dann nutzt das Template die geänderte Rolle an dieser Stelle schlicht nicht.
 
 ## Eine Schriftvariante ist nicht auswählbar
 
 Die Zuordnung im Bereich *Template* bietet nur Variationen aus dem **aktuell gewählten** Font-Set an.
 
-**Lösung:** Das passende Font-Set im Bereich *Creation* auswählen, oder die gewünschte Variation im aktuellen Set anlegen.
+**Lösung:** Das passende Font-Set im Bereich *Erstellen* auswählen, oder die gewünschte Variation im aktuellen Set anlegen.
 
 ## Eine Datei lässt sich nicht importieren
 
-**Meldung:** *No Brand Kit setup* oder *The file belongs to …*
+**Meldung:** *Keine Brand-Kit-Einrichtung* oder *Die Datei gehört zu „…“*
 
 Die Datei trägt nicht die Kennung des Brand Kit Generators. Entweder stammt sie aus einem anderen Werkzeug, oder es ist gar keine Einrichtung — sondern etwa die `brand-setup.json` aus einem ZIP eines sehr alten Standes.
 
@@ -66,9 +66,9 @@ Die Datei trägt nicht die Kennung des Brand Kit Generators. Entweder stammt sie
 
 ## Ein Template ist aus der Auswahl verschwunden
 
-Es wurde über **Remove** aus dem Katalog genommen. Die Datei ist noch da.
+Es wurde über **Entfernen** aus dem Katalog genommen. Die Datei ist noch da.
 
-**Lösung:** Im Bereich *Template* auf **Restore** in der Hinweiszeile klicken. Alternativ stellt *Reset to factory defaults* den vollständigen Katalog wieder her — setzt dabei allerdings auch alles andere zurück.
+**Lösung:** Im Bereich *Template* auf **Wiederherstellen** in der Hinweiszeile klicken. Alternativ stellt *Auf Werkseinstellung zurücksetzen* den vollständigen Katalog wieder her — setzt dabei allerdings auch alles andere zurück.
 
 ## Die Oberfläche ist in der falschen Sprache
 

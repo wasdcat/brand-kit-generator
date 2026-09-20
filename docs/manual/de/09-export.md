@@ -2,9 +2,14 @@
 
 ## Die beiden Wege
 
-**PNG** unten rechts erzeugt eine einzelne Datei im gerade gewählten Format.
+Es gibt zwei Wege, um Grafiken auszugeben:
 
-**ZIP (alle Formate)** erzeugt ein Archiv mit allen Formaten, die im Bereich *Export* angehakt sind. Dort können Sie einzelne abwählen, wenn Sie etwa nie Querformat brauchen.
+- **Schnell-Exportleiste (unten rechts):**
+  - **PNG (`*Format*`)** (etwa `PNG (16:9)`) erzeugt direkt eine einzelne Datei im gerade gewählten Format.
+  - **ZIP (alle Formate)** erzeugt ein Archiv mit allen Formaten, die im Bereich *Export* ausgewählt sind.
+- **Bereich Export (in der Seitenleiste):**
+  - Hier bestimmen Sie unter **Formate für das ZIP-Paket**, welche Formate ins Archiv gepackt werden.
+  - Über **Aktuelle Ansicht als PNG herunterladen** und **Alle Formate als ZIP-Paket exportieren** starten Sie den jeweiligen Vorgang.
 
 Während eines ZIP-Exports zeigt der Bereich *Export* einen Fortschrittsbalken mit dem Format, das gerade gerendert wird.
 

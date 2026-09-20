@@ -2,9 +2,14 @@
 
 ## The two routes
 
-**PNG** at the bottom right produces a single file in the format currently chosen.
+There are two ways to export graphics:
 
-**ZIP (all formats)** produces an archive with every format ticked in the *Export* area. You can untick individual ones there if you never need landscape, say.
+- **Quick export bar (bottom right):**
+  - **PNG (`*format*`)** (such as `PNG (16:9)`) produces a single file in the format currently chosen.
+  - **ZIP (all formats)** produces an archive with every format chosen in the *Export* area.
+- **Export area (in the sidebar):**
+  - Under **Formats for the ZIP set**, choose which formats to include in the package.
+  - Click **Download the current view as PNG** or **Export all formats as a ZIP package** to run the export.
 
 During a ZIP export the *Export* area shows a progress bar naming the format being rendered.
 

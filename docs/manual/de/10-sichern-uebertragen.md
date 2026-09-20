@@ -45,7 +45,7 @@ Der Ausschnitt selbst ist in beiden Fällen dabei. Er wird **je Template und For
 - gegebenenfalls einen Hinweis zur Version
 
 > [!CAUTION] Laden ersetzt die aktuelle Einrichtung
-> Ein Import überschreibt Firma, Produkte, Farbsets, Font-Sets und die Texte. Was nicht als Datei gesichert ist, ist danach weg. Der Dialog sagt das; *Cancel* oder die Escape-Taste brechen ab, *Replace setup* führt aus.
+> Ein Import überschreibt Firma, Produkte, Farbsets, Font-Sets und die Texte. Was nicht als Datei gesichert ist, ist danach weg. Der Dialog sagt das; *Abbrechen* oder die Escape-Taste brechen ab, *Einrichtung ersetzen* führt aus.
 
 ### Wenn eine Datei abgelehnt wird
 

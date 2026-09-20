@@ -19,7 +19,7 @@ Die Copyright-Zeile ist meist die kleinste Schrift im Overlay — ein `© Ihre F
 
 Ein Produkt ist alles, was eine eigene Identität hat: eine Sendung, ein Spiel, eine Reihe, ein Format. Jedes bekommt Titel, Slogan und Logo.
 
-**New** legt ein neues an, **Duplicate** kopiert das aktuelle — praktisch für eine Reihe, die sich nur im Namen unterscheidet.
+**Neu** legt ein neues an, **Duplizieren** kopiert das aktuelle (und über **Löschen** entfernen Sie es) — praktisch für eine Reihe, die sich nur im Namen unterscheidet.
 
 Der Eintrag *Default* lässt sich wie überall weder umbenennen noch löschen; er ist die Rückfalloption, wenn ein Produkt gelöscht wird.
 
@@ -28,7 +28,7 @@ Der Eintrag *Default* lässt sich wie überall weder umbenennen noch löschen; e
 
 ## Logos hochladen
 
-Beide Bereiche nehmen ein Logo über **Change logo** entgegen. Zwei Dinge passieren dabei automatisch.
+Beide Bereiche nehmen ein Logo über **Logo ändern** entgegen. Zwei Dinge passieren dabei automatisch.
 
 ### Rasterbilder werden verkleinert
 

@@ -17,22 +17,22 @@ Die drei Beispiele sind als Anschauungsmaterial gedacht. Sie zeigen drei sehr ve
 
 ## Platzhalter
 
-Der Block *Placeholders in this template* zeigt alle zwölf Platzhalter, die es gibt. Hervorgehoben sind die, die das gewählte Template verwendet.
+Der Block *Platzhalter in diesem Template* zeigt alle zwölf Platzhalter, die es gibt. Hervorgehoben sind die, die das gewählte Template verwendet.
 
 | Platzhalter | Kommt aus |
 | --- | --- |
-| `title`, `subtitle`, `description`, `tag`, `tag2` | Bereich *Creation* |
-| `product.title`, `product.slogan`, `product.logo` | Bereich *Products* |
-| `company.name`, `company.slogan`, `company.copyright`, `company.logo` | Bereich *Company* |
+| `title`, `subtitle`, `description`, `tag`, `tag2` | Bereich *Erstellen* |
+| `product.title`, `product.slogan`, `product.logo` | Bereich *Produkte* |
+| `company.name`, `company.slogan`, `company.copyright`, `company.logo` | Bereich *Unternehmen* |
 
-Steht dort eine Warnung über *unknown placeholders*, verwendet die Template-Datei einen Namen, den die Anwendung nicht kennt — meist ein Tippfehler in der Datei.
+Steht dort eine Warnung über *Unbekannte Platzhalter (Tippfehler?)*, verwendet die Template-Datei einen Namen, den die Anwendung nicht kennt — meist ein Tippfehler in der Datei.
 
 ## Typografie zuordnen
 
 Darunter steht für jeden Platzhalter, den das Template benutzt, eine Zeile mit zwei Feldern:
 
 - **Variation** — welche Schriftvariante aus dem gewählten Font-Set
-- **Weight** — welche Strichstärke. Der Bereich hängt von der Schriftfamilie ab; das Feld nennt den der verwendeten.
+- **Strichstärke** — welche Strichstärke. Der Bereich hängt von der Schriftfamilie ab; das Feld nennt den der verwendeten.
 
 Die Schriftgröße steht bewusst **nicht** hier. Sie bleibt im Template, weil sie dort Element für Element und Format für Format abgestimmt ist. Im Lower Third wächst der Titel vom Querformat zum Hochformat um das 1,4-fache, die Markenzeile aber nur um das 1,2-fache — damit der Titel im schmalen Format stärker dominiert. Eine einzelne Zahl in der Anwendung könnte das nicht ausdrücken.
 
@@ -41,12 +41,12 @@ Die Schriftgröße steht bewusst **nicht** hier. Sie bleibt im Template, weil si
 
 ## Templates aus dem Katalog nehmen
 
-Unter der Auswahl steht der Dateipfad und daneben **Remove**. Der Knopf fragt einmal nach.
+Unter der Auswahl steht der Dateipfad und daneben **Entfernen**. Der Knopf fragt einmal nach (mit **Sicher?**).
 
 > [!IMPORTANT] Entfernen löscht keine Datei
-> Ein Template ist eine Datei auf der Festplatte, und ein Browser darf keine Dateien löschen. **Remove** nimmt den Eintrag aus dem Katalog und merkt sich das. Die Datei bleibt unter `src/templates/` liegen und steht weiter im Manifest.
+> Ein Template ist eine Datei auf der Festplatte, und ein Browser darf keine Dateien löschen. **Entfernen** nimmt den Eintrag aus dem Katalog und merkt sich das. Die Datei bleibt unter `src/templates/` liegen und steht weiter im Manifest.
 
-Sobald etwas entfernt ist, erscheint darunter eine Zeile mit den entfernten Templates und einem **Restore**-Knopf, der alle auf einmal zurückholt. Auch *Reset to factory defaults* in der Kopfzeile stellt den vollständigen Katalog wieder her.
+Sobald etwas entfernt ist, erscheint darunter eine Zeile mit den entfernten Templates und einem **Wiederherstellen**-Knopf, der alle auf einmal zurückholt. Auch *Auf Werkseinstellung zurücksetzen* in der Kopfzeile stellt den vollständigen Katalog wieder her.
 
 Das letzte verbleibende Template lässt sich nicht entfernen — ohne Template gäbe es nichts zu rendern.
 

@@ -29,7 +29,7 @@ Everything is filled with sample values on first start. You can begin straight a
 
 **4. Check it against real material.** A row of symbols above the preview switches the background: dark and light chequerboard, black, white and — through the image symbol — your own background image. That is how you see whether the overlay stays readable over your footage. A background image is more than something to look at: it is exported underneath the overlay.
 
-**5. Export.** Bottom right, **PNG** produces the file for the format currently selected. **ZIP (all formats)** puts every selected format into one archive.
+**5. Export.** Bottom right, **PNG (`*format*`)** (such as **PNG (9:16)**) produces the file for the format currently selected. **ZIP (all formats)** puts every selected format into one archive. (In the *Export* area, you also find **Download the current view as PNG** and **Export all formats as a ZIP package**.)
 
 Done. The PNG is in your downloads folder and ready for the edit.
 
