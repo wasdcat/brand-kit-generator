@@ -30,6 +30,8 @@ Browser storage is full; your setup was **not** saved.
 
 **Then:** Delete products you no longer need, especially ones with a large logo. Store logos as SVG rather than PNG — they are many times smaller.
 
+The background image is not a candidate: it is not in this store at all, but kept separately.
+
 ## The export does nothing, or produces something unusable
 
 **Check the browser.** The export is verified for Chrome and Edge. In Safari it is not reliable.

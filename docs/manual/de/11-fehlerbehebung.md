@@ -22,13 +22,15 @@ Wird die Anwendung direkt nach einer Aktualisierung des Projekts geöffnet, kann
 
 **Lösung:** Neu laden unter Umgehung des Zwischenspeichers — `Strg`+`Umschalt`+`R` (Windows) beziehungsweise `Cmd`+`Umschalt`+`R` (macOS).
 
-## „Browser storage is full"
+## „Der Browserspeicher ist voll"
 
 Der Browserspeicher ist voll; Ihre Einrichtung wurde **nicht** gespeichert.
 
 **Sofort:** *Speichern* in der Kopfzeile, um die Arbeit in eine Datei zu retten.
 
 **Danach:** Nicht mehr benötigte Produkte löschen, besonders solche mit großem Logo. Logos als SVG statt als PNG hinterlegen — sie sind um ein Vielfaches kleiner.
+
+Das Hintergrundbild kommt dafür nicht infrage: Es liegt gar nicht in diesem Speicher, sondern getrennt davon.
 
 ## Der Export macht nichts oder liefert Unbrauchbares
 

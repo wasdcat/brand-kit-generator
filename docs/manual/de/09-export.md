@@ -4,7 +4,7 @@
 
 **PNG** unten rechts erzeugt eine einzelne Datei im gerade gewählten Format.
 
-**ZIP (all formats)** erzeugt ein Archiv mit allen Formaten, die im Bereich *Export* angehakt sind. Dort können Sie einzelne abwählen, wenn Sie etwa nie Querformat brauchen.
+**ZIP (alle Formate)** erzeugt ein Archiv mit allen Formaten, die im Bereich *Export* angehakt sind. Dort können Sie einzelne abwählen, wenn Sie etwa nie Querformat brauchen.
 
 Während eines ZIP-Exports zeigt der Bereich *Export* einen Fortschrittsbalken mit dem Format, das gerade gerendert wird.
 
@@ -32,14 +32,21 @@ beispielshow_overlays.zip
       ├── beispielshow_lower_third_neon_purple_1x1.png
       ├── beispielshow_lower_third_neon_purple_9x16.png
       ├── …
-      └── brand-setup.json
+      ├── brand-setup.json
+      └── background.png
 ```
 
 ### brand-setup.json
 
-Jedem ZIP liegt die vollständige Einrichtung bei, aus der die Bilder entstanden sind.
+Jedem ZIP liegt die Einrichtung bei, aus der die Bilder entstanden sind.
 
-Damit ist ein Export reproduzierbar. Wer die Dateien Monate später wieder braucht, lädt die beiliegende JSON über *Laden* und steht exakt dort, wo Sie beim Export standen.
+Damit ist ein Export reproduzierbar. Wer die Dateien Monate später wieder braucht, lädt die beiliegende JSON über *Laden* und steht wieder dort, wo Sie beim Export standen.
+
+### background.png
+
+War ein Hintergrundbild gesetzt, liegt es als eigene Datei daneben, mit der Endung des Bildes — `background.jpg` bei einem JPEG. Nicht in der JSON, weil es dort als Text kodiert um ein Drittel größer wäre und sich nicht ansehen ließe. Die JSON nennt nur seinen Namen und den Ausschnitt.
+
+Nach dem Laden der JSON fragt die Anwendung deshalb nach dem Bild. Wählen Sie die Datei aus demselben Ordner, und der Ausschnitt sitzt wieder.
 
 ## Was im Export anders ist als in der Vorschau
 

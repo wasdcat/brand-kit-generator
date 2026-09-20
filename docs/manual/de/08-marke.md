@@ -45,7 +45,7 @@ Eine SVG-Datei ist ausführbarer Code. Sie kann Skripte, Ereignisbehandlung und 
 Für Logos ist SVG die bessere Wahl: beliebig skalierbar bei winziger Dateigröße.
 
 > [!WARNING] Speicher voll
-> Meldet die Anwendung *Browser storage is full*, wurde Ihre Einrichtung **nicht** gespeichert. Sichern Sie sofort über *Speichern* in eine Datei und entfernen Sie dann nicht mehr benötigte Produkte oder besonders große Logos.
+> Meldet die Anwendung *Der Browserspeicher ist voll*, wurde Ihre Einrichtung **nicht** gespeichert. Sichern Sie sofort über *Speichern* in eine Datei und entfernen Sie dann nicht mehr benötigte Produkte oder besonders große Logos.
 
 ## Wo die Werte landen
 

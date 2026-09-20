@@ -29,7 +29,7 @@ Beim ersten Start ist alles mit Beispielwerten gefüllt. Sie können sofort losl
 
 **4. Gegen echtes Material prüfen.** Rechts über der Vorschau schaltet eine Reihe von Symbolen den Hintergrund um: dunkles und helles Karomuster, Schwarz, Weiß und — über das Bildsymbol — ein eigenes Hintergrundbild. So sehen Sie, ob das Overlay über Ihrem Material lesbar bleibt. Ein Hintergrundbild ist dabei mehr als eine Ansichtshilfe: Es wird unter dem Overlay mitexportiert.
 
-**5. Exportieren.** Unten rechts erzeugt **PNG** die Datei für das gerade gewählte Format. **ZIP (all formats)** legt alle ausgewählten Formate zusammen in ein Archiv.
+**5. Exportieren.** Unten rechts erzeugt **PNG** die Datei für das gerade gewählte Format. **ZIP (alle Formate)** legt alle ausgewählten Formate zusammen in ein Archiv.
 
 Fertig. Die PNG-Datei liegt in Ihrem Download-Ordner und kann in den Schnitt.
 

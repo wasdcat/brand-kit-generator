@@ -32,14 +32,21 @@ sample_show_overlays.zip
       ├── sample_show_lower_third_neon_purple_1x1.png
       ├── sample_show_lower_third_neon_purple_9x16.png
       ├── …
-      └── brand-setup.json
+      ├── brand-setup.json
+      └── background.png
 ```
 
 ### brand-setup.json
 
-Every ZIP carries the complete setup the images came from.
+Every ZIP carries the setup the images came from.
 
-That makes an export reproducible. Anyone needing those files again months later loads the enclosed JSON through *Load* and stands exactly where you stood when you exported.
+That makes an export reproducible. Anyone needing those files again months later loads the enclosed JSON through *Load* and stands where you stood when you exported.
+
+### background.png
+
+If a background image was set, it sits beside the setup as a file of its own, carrying the picture's own extension - `background.jpg` for a JPEG. Not inside the JSON, where encoding it as text would make it a third larger and impossible to look at. The JSON names it and keeps the framing.
+
+After loading the JSON the application therefore asks for the picture. Pick the file from that same folder and the framing is back in place.
 
 ## What differs from the preview
 

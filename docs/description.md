@@ -7,6 +7,7 @@ It does not edit video and does not render it — it delivers the graphic. It ru
 ## Key Features
 
 * **Transparent PNG output, or a finished picture:** On its own an export is a PNG with a transparent background, meant to sit as the topmost layer over video or stills in any editor or streaming software. Put a background image underneath and that image is exported with the overlay — the file is then ready to upload.
+* **A setup you can put down and pick up:** Product, brand, colours, fonts, wording and the background — including how it is framed for each template and format — are saved in the browser and can be written to a file to move between machines or keep one setup per client.
 * **Five independent building blocks:** Product, template, colour set, font set and content are chosen separately. A different colour set changes the colour without touching the layout, a different template changes the layout without retyping the text.
 * **Four output formats:** The same template renders at 1:1, 9:16, 16:9 and 4:5, and adapts its layout to each one.
 * **Bundled fonts and colour sets:** Seven open-source variable font families ship with the tool, alongside colour sets of seven colour roles each.
@@ -21,6 +22,8 @@ A template is an HTML file whose entire design sits in its CSS. Anyone who knows
 ## Your setup stays local
 
 Everything you set up is kept in your browser and can be saved to a file — as a backup, to move it onto another machine, or to keep several setups side by side, one per client.
+
+A background image belongs to that setup. How you framed it is remembered for each template and each format, and the picture itself either travels inside the file or is named in it, so you can pick it again and find the framing already in place.
 
 ## How to use
 
