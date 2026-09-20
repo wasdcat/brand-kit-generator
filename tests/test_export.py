@@ -152,6 +152,19 @@ def test_the_saved_configuration_matches_the_one_in_the_zip(app):
     assert from_button == from_zip
 
 
+def test_the_saved_configuration_filename_uses_the_company_name(app):
+    app.export_config()
+    assert app.last_filename == "wasdcat_brandkit_config.json"
+
+    app.evaluate("(s) => { s.company.name = 'Acme Studios'; }")
+    app.export_config()
+    assert app.last_filename == "acme_studios_brandkit_config.json"
+
+    app.evaluate("(s) => { s.company.name = ''; }")
+    app.export_config()
+    assert app.last_filename == "brand_brandkit_config.json"
+
+
 def test_the_export_stage_never_changes_the_preview_format(app):
     """A ZIP walks every format; the preview must stay where it was."""
     app.select(template="example-3-title-card", fmt="9:16")

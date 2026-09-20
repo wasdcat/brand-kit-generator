@@ -955,7 +955,7 @@
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       };
 
-      const slug = (str) => String(str || 'overlay').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || 'overlay';
+      const slug = (str, fallback = 'overlay') => String(str || fallback).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || fallback;
 
       /** The background inside a ZIP, named after what the data URL says it is. */
       const backgroundFilename = () => {
@@ -1145,7 +1145,8 @@
       const writeSetupFile = (withImage) => {
         const blob = new Blob([JSON.stringify(buildSetupSnapshot({ withImage }), null, 2)],
           { type: 'application/json' });
-        downloadBlob(blob, 'wasdcat_brandkit_config.json');
+        const filename = `${slug(company.name, 'brand')}_brandkit_config.json`;
+        downloadBlob(blob, filename);
         showToast(t(withImage ? 'msg.configSavedWithImage' : 'msg.configSaved'));
       };
 
