@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-09-20
+
+### Fixed
+- **Title Card Subtitle Wrapping**: Prevented subtitle line wrapping in the title-card template during export by enforcing a single-line ellipsis style.
+- **Export Text Clamping Stability**: Hardened export-time text clamping so overlong clamped fields no longer collapse to empty content in edge cases.
+
 ## [1.1.0] - 2026-09-20
 
 ### Changed

@@ -105,11 +105,20 @@
         el.textContent = original.slice(0, mid).trimEnd() + '…';
         if (overflows()) hi = mid - 1; else lo = mid;
       }
+      if (lo <= 0) {
+        el.textContent = original;
+        continue;
+      }
       // Cut at a word boundary where possible
       let cut = original.slice(0, lo);
       const space = cut.lastIndexOf(' ');
       if (space > cut.length * 0.6) cut = cut.slice(0, space);
-      el.textContent = cut.trimEnd() + '…';
+      const trimmed = cut.trimEnd();
+      if (!trimmed) {
+        el.textContent = original;
+        continue;
+      }
+      el.textContent = trimmed + '…';
       changed.push([el, original]);
     }
     return () => changed.forEach(([el, text]) => { el.textContent = text; });

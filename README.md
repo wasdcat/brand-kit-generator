@@ -4,7 +4,7 @@
 
 # Brand Kit Generator
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue)
+![Version](https://img.shields.io/badge/version-1.1.1-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 A browser-based tool for creating pixel-perfect, transparent PNG overlays for social media based on modular HTML/CSS templates.
