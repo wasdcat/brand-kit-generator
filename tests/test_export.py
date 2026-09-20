@@ -154,6 +154,10 @@ def test_the_saved_configuration_matches_the_one_in_the_zip(app):
 
 def test_the_saved_configuration_filename_uses_the_company_name(app):
     app.export_config()
+    assert app.last_filename == "your_company_brandkit_config.json"
+
+    app.evaluate("(s) => { s.company.name = 'WASDCAT'; }")
+    app.export_config()
     assert app.last_filename == "wasdcat_brandkit_config.json"
 
     app.evaluate("(s) => { s.company.name = 'Acme Studios'; }")
