@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Example 2 &mdash; Angled Bar</title>
+  <meta name="description" content="Lower third that only takes the width it needs, bottom left, with the right edge cut at an angle. Branding line with tag, title underneath.">
+  <meta name="category" content="Example">
+  <link rel="stylesheet" href="../fonts/fonts.css">
+  <style>
+    /* =====================================================================
+       VALUES COMING FROM THE APP
+       ---------------------------------------------------------------------
+       Opening this file directly uses the sample values below. Inside the app
+       they get overwritten:
+         --color-*       from the selected colour set
+         --tag-color     which colour role a tag chip uses (colour set)
+         --font-<slot>   family, -weight and -axes per placeholder, from the font
+                         set and the mapping in the Template area. A namespaced
+                         slot loses its dot: product.title -> --font-product-title
+         data-format     "1:1" | "4:5" | "9:16" | "16:9" (plus width/height of .frame)
+
+       Every font declaration keeps its own value as the fallback, so the file
+       still looks right on its own. The `font:` shorthand is avoided throughout -
+       it resets font-variation-settings and would throw away the axis values of
+       a variation.
+       ===================================================================== */
+    .frame {
+      --color-background: #180c26;
+      --color-accent: #facc15;
+      --color-secondary: #c084fc;
+      --color-border: #a855f7;
+      --color-text: #ffffff;
+      --color-subtext: #e9d5ff;
+      --color-description: #c084fc;
+
+      --font-base: "Inter";
+    }
+
+    /* =====================================================================
+       THE DESIGN OF THIS TEMPLATE
+       ---------------------------------------------------------------------
+       Sizes in cqmin, a percent of the shorter side of the frame. Every output
+       format is 1080 px on its short side, so 1cqmin is 10.8 px throughout and
+       the bar keeps one physical size across all four.
+
+       The angle is a clip-path on the box. The right padding carries the same
+       --slant value on top of the normal padding, so the cut never runs into
+       the text no matter how long the title is.
+       ===================================================================== */
+    .frame {
+      --fs-title: 3.4cqmin;
+      --fs-product: 1.9cqmin;
+      --fs-tag: calc(var(--fs-product) * 0.9);
+
+      --margin-x: 5cqmin;      /* distance from the left frame edge */
+      --margin-bottom: 6cqmin; /* distance from the bottom frame edge */
+      --max-width: 74cqw;      /* the bar never spans the whole frame */
+
+      --pad-x: 2.6cqmin;
+      --pad-y: 2.2cqmin;
+      --gap: 0.8cqmin;         /* between branding line and title */
+      --slant: 4.5cqmin;       /* how far the bottom right corner is pulled in */
+
+      --box-opacity: 92%;
+      --accent-width: 0.7cqmin; /* the bar along the left edge */
+
+      --logo-size: 7.2cqmin;
+      --logo-radius: 1cqmin;
+
+      container-type: size;    /* makes cqmin / cqw relate to the frame */
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      font-family: var(--font-base), sans-serif;
+    }
+
+    /* Narrow formats have little room to the right, so the bar may take more of
+       the width; on 9:16 it also clears the caption zone that vertical
+       full-screen posts place at the bottom. */
+    .frame[data-format="9:16"] { --max-width: 88cqw; --margin-bottom: 26cqmin; }
+    .frame[data-format="4:5"],
+    .frame[data-format="1:1"]  { --max-width: 86cqw; }
+
+    .bar {
+      position: absolute;
+      left: var(--margin-x);
+      bottom: var(--margin-bottom);
+      max-width: var(--max-width);
+      display: flex;
+      align-items: center;
+      gap: var(--pad-x);
+      /* The slant is added to the right padding so the cut stays clear of the text */
+      padding: var(--pad-y) calc(var(--pad-x) + var(--slant)) var(--pad-y) calc(var(--pad-x) + var(--accent-width));
+      background: color-mix(in srgb, var(--color-background) var(--box-opacity), transparent);
+      /* Top right stays square, bottom right is pulled in: the cut runs downwards
+         to the right, in the direction the text reads. */
+      clip-path: polygon(0 0, 100% 0, calc(100% - var(--slant)) 100%, 0 100%);
+    }
+
+    /* Accent along the left edge. A child rather than a border, so the clip-path
+       of the box cannot cut into it. */
+    .bar::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--accent-width);
+      background: linear-gradient(to bottom, var(--color-accent), var(--color-border));
+    }
+
+    .logo {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      border-radius: var(--logo-radius);
+      object-fit: contain;
+      flex: none;
+    }
+
+    .text {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 1cqmin;
+      min-width: 0;
+    }
+
+    .brand-product {
+      font-family: var(--font-product-title, "Recursive"), sans-serif;
+      font-weight: var(--font-product-title-weight, 900);
+      font-variation-settings: var(--font-product-title-axes, normal);
+      font-size: var(--fs-product);
+      line-height: 1.1;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      white-space: nowrap;
+    }
+
+    .tag {
+      padding: 0.42em 0.72em;
+      border-radius: 0.3em;
+      font-family: var(--font-tag, "Inter"), sans-serif;
+      font-weight: var(--font-tag-weight, 700);
+      font-variation-settings: var(--font-tag-axes, normal);
+      font-size: var(--fs-tag);
+      line-height: 1;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      /* The chip text runs in the background colour, which is why the colour set
+         never assigns the background role to a chip. */
+      color: var(--color-background);
+      white-space: nowrap;
+    }
+    .tag-1 { background: var(--tag-color, var(--color-accent)); }
+    .tag-2 { background: var(--tag2-color, var(--color-secondary)); }
+
+    .title {
+      font-family: var(--font-title, "Recursive"), sans-serif;
+      font-weight: var(--font-title-weight, 800);
+      font-variation-settings: var(--font-title-axes, normal);
+      font-size: var(--fs-title);
+      line-height: 1.2;
+      color: var(--color-text);
+      /* Deliberately NOT line-clamped, unlike the lower third.
+         This box takes only the width it needs: it is positioned with `left`
+         but no `right`, so its width follows its content. The clamping the app
+         runs before an export shortens the text and measures again - and here
+         every shortening narrows the box, so the text keeps overflowing and the
+         search collapses the title to a bare ellipsis. A template whose box is
+         pinned on both sides (see lower-third.html) can clamp safely; this one
+         lets a long title wrap instead, bounded by --max-width. */
+      overflow-wrap: anywhere;
+    }
+
+    /* Only for viewing this file directly; the app makes the background transparent */
+    body { margin: 0; background: #3b4a5c; }
+    [data-slot]:not(img):empty { display: none; }
+  </style>
+</head>
+<body>
+  <div class="frame" data-format="16:9">
+    <div class="bar">
+      <img class="logo" data-slot="product.logo" alt="" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23a855f7'/%3E%3C/svg%3E">
+      <div class="text">
+        <div class="brand">
+          <span class="brand-product" data-slot="product.title">Pod Rush</span>
+          <span class="tag tag-1" data-slot="tag">Podcast #42</span>
+          <span class="tag tag-2" data-slot="tag2">Update</span>
+        </div>
+        <div class="title" data-slot="title">Episode #42: The Ray Tracing Future</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

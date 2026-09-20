@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Example 3 &mdash; Title Card</title>
+  <meta name="description" content="Full-frame card for feed posts: tags, large title, subtitle and description over a scrim that fades up from the bottom, with product logo and copyright on the base line.">
+  <meta name="category" content="Example">
+  <link rel="stylesheet" href="../fonts/fonts.css">
+  <style>
+    /* =====================================================================
+       VALUES COMING FROM THE APP
+       ---------------------------------------------------------------------
+       Opening this file directly uses the sample values below. Inside the app
+       they get overwritten:
+         --color-*       from the selected colour set
+         --tag-color     which colour role a tag chip uses (colour set)
+         --font-<slot>   family, -weight and -axes per placeholder, from the font
+                         set and the mapping in the Template area. A namespaced
+                         slot loses its dot: company.copyright -> --font-company-copyright
+         data-format     "1:1" | "4:5" | "9:16" | "16:9" (plus width/height of .frame)
+
+       Every font declaration keeps its own value as the fallback, so the file
+       still looks right on its own. The `font:` shorthand is avoided throughout -
+       it resets font-variation-settings and would throw away the axis values of
+       a variation.
+       ===================================================================== */
+    .frame {
+      --color-background: #180c26;
+      --color-accent: #facc15;
+      --color-secondary: #c084fc;
+      --color-border: #a855f7;
+      --color-text: #ffffff;
+      --color-subtext: #e9d5ff;
+      --color-description: #c084fc;
+
+      --font-base: "Inter";
+    }
+
+    /* =====================================================================
+       THE DESIGN OF THIS TEMPLATE
+       ---------------------------------------------------------------------
+       This is the counterpart to a lower third: not a strip over moving footage
+       but a card that fills the frame, for a still post. Everything sits on the
+       base line, the scrim above it keeps the type readable over any image, and
+       the whole upper area stays free for the picture itself.
+
+       Sizes in cqmin, a percent of the shorter side of the frame. All four
+       formats are 1080 px on their short side, so 1cqmin is 10.8 px in each and
+       the card reads at one size across them. What does change per format is how
+       much room the scrim takes - a 16:9 frame is short, a 9:16 frame is not.
+       ===================================================================== */
+    .frame {
+      --fs-title: 6.2cqmin;
+      --fs-subtitle: 2.6cqmin;
+      --fs-description: 1.9cqmin;
+      --fs-tag: 1.7cqmin;
+      --fs-footer: 1.6cqmin;
+
+      --margin: 6cqmin;
+      --gap: 1.8cqmin;          /* between the blocks of the stack */
+      --measure: 78cqw;         /* line length of the text column */
+
+      /* Scrim: opaque at the base line, gone further up */
+      --scrim-height: 62%;
+      --scrim-opacity: 0.88;
+
+      /* Rule above the base line */
+      --rule-weight: 1px;
+      --rule-color: color-mix(in srgb, var(--color-subtext) 35%, transparent);
+
+      --logo-size: 4.6cqmin;
+      --logo-radius: 0.9cqmin;
+
+      container-type: size;     /* makes cqmin / cqw relate to the frame */
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      font-family: var(--font-base), sans-serif;
+    }
+
+    /* A 16:9 frame is only 1080 px tall, so a scrim of the same percentage eats
+       far more of the picture than it does in a tall one. */
+    .frame[data-format="16:9"] { --scrim-height: 78%; --fs-title: 5.2cqmin; }
+    .frame[data-format="9:16"] { --scrim-height: 48%; --margin: 7cqmin; }
+
+    /* Scrim. Many stops rather than two, so no band shows where it ends. */
+    .scrim {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: var(--scrim-height);
+      pointer-events: none;
+      background: linear-gradient(to top,
+        rgb(0 0 0 / calc(var(--scrim-opacity) * 1))     0%,
+        rgb(0 0 0 / calc(var(--scrim-opacity) * 0.86))  14%,
+        rgb(0 0 0 / calc(var(--scrim-opacity) * 0.68))  28%,
+        rgb(0 0 0 / calc(var(--scrim-opacity) * 0.48))  42%,
+        rgb(0 0 0 / calc(var(--scrim-opacity) * 0.31))  55%,
+        rgb(0 0 0 / calc(var(--scrim-opacity) * 0.18))  67%,
+        rgb(0 0 0 / calc(var(--scrim-opacity) * 0.09))  78%,
+        rgb(0 0 0 / calc(var(--scrim-opacity) * 0.03))  89%,
+        rgb(0 0 0 / 0) 100%);
+    }
+
+    .card {
+      position: absolute;
+      left: var(--margin);
+      right: var(--margin);
+      bottom: var(--margin);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--gap);
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9cqmin;
+    }
+
+    .tag {
+      padding: 0.42em 0.78em;
+      border-radius: 0.3em;
+      font-family: var(--font-tag, "Inter"), sans-serif;
+      font-weight: var(--font-tag-weight, 700);
+      font-variation-settings: var(--font-tag-axes, normal);
+      font-size: var(--fs-tag);
+      line-height: 1;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      /* The chip text runs in the background colour, which is why the colour set
+         never assigns the background role to a chip. */
+      color: var(--color-background);
+      white-space: nowrap;
+    }
+    .tag-1 { background: var(--tag-color, var(--color-accent)); }
+    .tag-2 { background: var(--tag2-color, var(--color-secondary)); }
+
+    .title {
+      max-width: var(--measure);
+      font-family: var(--font-title, "Recursive"), sans-serif;
+      font-weight: var(--font-title-weight, 800);
+      font-variation-settings: var(--font-title-axes, normal);
+      font-size: var(--fs-title);
+      line-height: 1.06;
+      letter-spacing: -0.015em;
+      color: var(--color-text);
+      /* Three lines at most; the app turns what is cut off into a real ellipsis
+         before the export, because the browser does not draw one into a PNG. */
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+    }
+
+    .subtitle {
+      max-width: var(--measure);
+      font-family: var(--font-subtitle, "Inter"), sans-serif;
+      font-weight: var(--font-subtitle-weight, 600);
+      font-variation-settings: var(--font-subtitle-axes, normal);
+      font-size: var(--fs-subtitle);
+      line-height: 1.3;
+      color: var(--color-subtext);
+    }
+
+    .description {
+      max-width: calc(var(--measure) * 0.82);
+      font-family: var(--font-description, "Inter"), sans-serif;
+      font-weight: var(--font-description-weight, 400);
+      font-variation-settings: var(--font-description-axes, normal);
+      font-size: var(--fs-description);
+      line-height: 1.45;
+      color: var(--color-description);
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+    }
+
+    /* Base line: logo and product on the left, copyright on the right */
+    .footer {
+      align-self: stretch;
+      margin-top: 0.6cqmin;
+      padding-top: 1.6cqmin;
+      border-top: var(--rule-weight) solid var(--rule-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2cqmin;
+    }
+
+    .by {
+      display: flex;
+      align-items: center;
+      gap: 1.1cqmin;
+      min-width: 0;
+    }
+
+    .logo {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      border-radius: var(--logo-radius);
+      object-fit: contain;
+      flex: none;
+    }
+
+    .product {
+      font-family: var(--font-product-title, "Recursive"), sans-serif;
+      font-weight: var(--font-product-title-weight, 700);
+      font-variation-settings: var(--font-product-title-axes, normal);
+      font-size: var(--fs-footer);
+      line-height: 1.2;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-text);
+      white-space: nowrap;
+    }
+
+    .copyright {
+      font-family: var(--font-company-copyright, "Inter"), sans-serif;
+      font-weight: var(--font-company-copyright-weight, 400);
+      font-variation-settings: var(--font-company-copyright-axes, normal);
+      font-size: var(--fs-footer);
+      line-height: 1.2;
+      color: var(--color-subtext);
+      white-space: nowrap;
+    }
+
+    /* Only for viewing this file directly; the app makes the background transparent */
+    body { margin: 0; background: #3b4a5c; }
+    [data-slot]:not(img):empty { display: none; }
+  </style>
+</head>
+<body>
+  <div class="frame" data-format="16:9">
+    <div class="scrim"></div>
+    <div class="card">
+      <div class="tags">
+        <span class="tag tag-1" data-slot="tag">Podcast #42</span>
+        <span class="tag tag-2" data-slot="tag2">Update</span>
+      </div>
+      <div class="title" data-slot="title">Episode #42: The Ray Tracing Future</div>
+      <div class="subtitle" data-slot="subtitle">Special guest: Alexander Vance</div>
+      <div class="description" data-slot="description">A deep dive into Unreal Engine 5.6, path tracing benchmarks and what the new consoles deliver.</div>
+      <div class="footer">
+        <div class="by">
+          <img class="logo" data-slot="product.logo" alt="" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23a855f7'/%3E%3C/svg%3E">
+          <span class="product" data-slot="product.title">Pod Rush</span>
+        </div>
+        <span class="copyright" data-slot="company.copyright">&copy; WASDCAT</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

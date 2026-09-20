@@ -1,0 +1,74 @@
+<!--
+  AREA 5: COMPANY
+
+  A fragment of the app template, not a standalone page. index.html has a
+  <div data-panel="company"> placeholder that app.js replaces with this file
+  before Vue mounts, so everything here is compiled as part of the one root
+  component and binds against the same setup() scope.
+-->
+<!-- ====================================================== -->
+<!-- AREA 5: COMPANY                                        -->
+<!-- ====================================================== -->
+<div v-show="activeTab === 'company'" class="space-y-5">
+
+  <span class="text-xs font-bold text-ui-200 uppercase tracking-wider block">{{ t('co.heading') }}</span>
+
+  <div class="p-4 rounded-lg bg-ui-950/80 border border-ui-800 space-y-4">
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-ui-400">{{ t('co.name') }}</span>
+        <span v-if="!usesSlot('company.name')" class="text-[10px] text-warn-400/80">{{ t('wf.notUsed') }}</span>
+      </div>
+      <input
+        type="text"
+        v-model="company.name"
+        placeholder="WASDCAT"
+        class="w-full bg-ui-800 border border-ui-700 text-ui-100 text-xs font-bold rounded-md px-3 py-2 focus:outline-none focus:border-accent-500"
+      />
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-ui-400">{{ t('co.slogan') }}</span>
+        <span v-if="!usesSlot('company.slogan')" class="text-[10px] text-warn-400/80">{{ t('wf.notUsed') }}</span>
+      </div>
+      <input
+        type="text"
+        v-model="company.slogan"
+        placeholder="Level Up Your Media"
+        class="w-full bg-ui-800 border border-ui-700 text-ui-200 text-xs rounded-md px-3 py-2 focus:outline-none focus:border-accent-500"
+      />
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-ui-400">{{ t('co.copyright') }}</span>
+        <span v-if="!usesSlot('company.copyright')" class="text-[10px] text-warn-400/80">{{ t('wf.notUsed') }}</span>
+      </div>
+      <input
+        type="text"
+        v-model="company.copyright"
+        placeholder="&copy; WASDCAT"
+        class="w-full bg-ui-800 border border-ui-700 text-ui-200 text-xs rounded-md px-3 py-2 focus:outline-none focus:border-accent-500"
+      />
+    </div>
+
+
+
+    <div class="space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] text-ui-400">{{ t('co.logo') }}</span>
+        <span v-if="!usesSlot('company.logo')" class="text-[10px] text-warn-400/80">{{ t('wf.notUsed') }}</span>
+      </div>
+      <div class="flex items-center justify-between p-3 rounded bg-ui-900 border border-ui-800 gap-3">
+        <div class="w-12 h-12 rounded bg-ui-800 p-1 flex items-center justify-center overflow-hidden border border-ui-700 shrink-0">
+          <img v-if="company.logo" :src="company.logo" alt="Logo" class="max-w-full max-h-full object-contain" />
+        </div>
+        <label class="px-3 py-1.5 rounded bg-accent-600 hover:bg-accent-500 text-white text-xs font-medium cursor-pointer transition">
+          {{ t('pr.changeLogo') }}
+          <input type="file" accept="image/*,.svg" class="hidden" @change="handleCompanyLogoUpload" />
+        </label>
+      </div>
+    </div>
+  </div>
+</div>

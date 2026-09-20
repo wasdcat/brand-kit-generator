@@ -1,0 +1,13 @@
+# =============================================================================
+# Ebene 2 der i18n-Kaskade: Texte des Themes "wasdcat".
+# =============================================================================
+
+de:
+  part: "Abschnitt"
+  chapter_toc_title: "Inhalt dieses Kapitels"
+  part_toc_title: "Inhalt dieses Abschnitts"
+
+en:
+  part: "Section"
+  chapter_toc_title: "In this chapter"
+  part_toc_title: "In this section"

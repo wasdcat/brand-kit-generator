@@ -1,0 +1,89 @@
+<!--
+  AREA 6: EXPORT
+
+  A fragment of the app template, not a standalone page. index.html has a
+  <div data-panel="export"> placeholder that app.js replaces with this file
+  before Vue mounts, so everything here is compiled as part of the one root
+  component and binds against the same setup() scope.
+-->
+<!-- ====================================================== -->
+<!-- AREA 6: EXPORT                                         -->
+<!-- ====================================================== -->
+<div v-show="activeTab === 'export'" class="space-y-6">
+  <div>
+    <span class="text-xs font-bold text-ui-200 uppercase tracking-wider block mb-2">{{ t('ex.formats') }}</span>
+    <div class="space-y-2">
+      <label
+        v-for="fmt in SOCIAL_FORMATS"
+        :key="fmt.id"
+        class="flex items-center justify-between p-3 rounded border transition cursor-pointer"
+        :class="selectedFormats.includes(fmt.id) ? 'bg-accent-600/10 border-accent-500/50 text-ui-100' : 'bg-ui-950/60 border-ui-800 text-ui-400'"
+      >
+        <div>
+          <span class="text-xs font-bold block">{{ formatName(fmt) }}</span>
+          <span class="text-[11px] text-ui-500">{{ fmt.width }} &times; {{ fmt.height }} px</span>
+        </div>
+        <input
+          type="checkbox"
+          :value="fmt.id"
+          v-model="selectedFormats"
+          class="w-4 h-4 rounded text-accent-600 bg-ui-800 border-ui-700"
+        />
+      </label>
+    </div>
+  </div>
+
+  <div class="p-3.5 rounded-lg bg-ui-950/80 border border-ui-800 space-y-1.5">
+    <span class="text-[11px] font-bold text-ui-300 block">{{ t('ex.current') }}</span>
+    <div class="text-[11px] text-ui-400 space-y-0.5">
+      <div class="flex justify-between gap-2"><span>{{ t('wf.product') }}</span><span class="text-ui-200 truncate">{{ activeProduct.title }}</span></div>
+      <div class="flex justify-between gap-2"><span>{{ t('wf.template') }}</span><span class="text-ui-200 truncate">{{ activeTemplate.name }}</span></div>
+      <div class="flex justify-between gap-2"><span>{{ t('wf.colorset') }}</span><span class="text-ui-200 truncate">{{ activeColorSet.name }}</span></div>
+      <div class="flex justify-between gap-2"><span>{{ t('wf.fontset') }}</span><span class="text-ui-200 truncate">{{ activeFontSet.name }}</span></div>
+    </div>
+  </div>
+
+  <div class="space-y-3">
+    <button
+      @click="exportSinglePNG"
+      :disabled="isExporting"
+      class="w-full py-3 px-4 rounded-md bg-ui-800 hover:bg-ui-700 disabled:opacity-50 text-ui-100 text-xs font-bold border border-ui-700 flex items-center justify-center gap-2 transition shadow"
+    >
+      <i data-lucide="download" class="w-4 h-4 text-info-400"></i>
+      <span>{{ t('ex.png') }}</span>
+    </button>
+
+    <button
+      @click="exportZipPackage"
+      :disabled="isExporting"
+      class="w-full py-3.5 px-4 rounded-md bg-gradient-to-r from-accent-600 via-accent-500 to-info-500 hover:from-accent-500 hover:to-info-400 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-2 transition shadow-lg shadow-accent-500/25"
+    >
+      <i data-lucide="package-open" class="w-4 h-4 text-white"></i>
+      <span>{{ isExporting ? exportStatusText : t('ex.zip') }}</span>
+    </button>
+
+    <!-- Export Progress Bar -->
+    <div v-if="isExporting" class="space-y-1.5 pt-1">
+      <div class="h-1.5 w-full bg-ui-800 rounded-full overflow-hidden">
+        <div
+          class="h-full bg-accent-500 transition-all duration-300 rounded-full"
+          :style="{ width: exportProgressPercent + '%' }"
+        ></div>
+      </div>
+      <div class="flex justify-between text-[10px] text-ui-400 font-mono">
+        <span class="truncate">{{ exportStatusText }}</span>
+        <span>{{ exportProgressPercent }}%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-3.5 rounded-lg bg-ui-950/80 border border-ui-800 text-ui-400 text-xs space-y-1.5">
+    <span class="font-semibold text-ui-300 block">{{ t('ex.notes') }}</span>
+    <p class="text-[11px] leading-relaxed">
+      {{ t('ex.note1') }}
+    </p>
+    <p class="text-[11px] leading-relaxed">
+      {{ t('ex.note2') }}
+    </p>
+  </div>
+</div>

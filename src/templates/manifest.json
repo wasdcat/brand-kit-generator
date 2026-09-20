@@ -1,0 +1,9 @@
+{
+  "$comment": "The template catalogue. A new template is an HTML file in this folder plus its name here - no code change. Paths are relative to this file. Name, description and category are read from the file's <title> and <meta> tags, so they do not belong here. Removing a template inside the app only hides it from the catalogue; the file stays and the Template area can bring it back.",
+  "templates": [
+    "lower-third.html",
+    "example-1-corner-bug.html",
+    "example-2-angled-bar.html",
+    "example-3-title-card.html"
+  ]
+}

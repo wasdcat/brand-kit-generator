@@ -1,0 +1,63 @@
+/**
+ * WASDCAT Brand Kit Generator - Default Dark
+ *
+ * Anthracite surfaces with a steel blue accent.
+ *
+ * A theme is a stylesheet, not a form: it is edited here, never in the app. The
+ * app only switches which of these files is linked.
+ *
+ * Every token is a space-separated RGB triple rather than a hex value, so the
+ * opacity modifiers in the markup keep working (bg-ui-950/80 and the like).
+ *
+ * The scale runs the way the interface is built: high numbers are surfaces,
+ * low numbers are type. Default Light fills the same slots with inverted
+ * values, which is why no markup has to change between themes.
+ */
+:root {
+  color-scheme: dark;
+
+  /* Neutrals - anthracite */
+  --ui-950:  21  23  26;   /* deepest surface: stage, sunken fields */
+  --ui-900:  27  30  34;   /* panel */
+  --ui-800:  38  42  47;   /* raised element, hairline border */
+  --ui-700:  52  57  65;   /* border on a raised element */
+  --ui-600:  71  77  87;
+  --ui-500: 106 113 124;   /* muted type */
+  --ui-400: 148 155 166;   /* secondary type */
+  --ui-300: 188 194 203;
+  --ui-200: 215 219 225;   /* body type */
+  --ui-100: 234 237 241;   /* headings, strongest type */
+
+  /* Accent - steel blue */
+  --accent-600:  63 123 168;
+  --accent-500:  76 140 187;
+  --accent-400: 107 163 206;
+  --accent-300: 147 191 221;
+  --accent-200: 186 216 234;
+
+  /* Signals */
+  --warn-500:   245 158  11;
+  --warn-400:   251 191  36;
+  --warn-300:   252 211  77;
+  --warn-200:   253 230 138;
+
+  --danger-500: 244  63  94;
+  --danger-400: 251 113 133;
+  --danger-300: 253 164 175;
+  --danger-200: 254 205 211;
+
+  --ok-500:      16 185 129;
+  --ok-400:      52 211 153;
+  --ok-300:     110 231 183;
+  --ok-200:     167 243 208;
+
+  --info-500:     6 182 212;
+  --info-400:    34 211 238;
+
+  --rail: 9 10 12;       /* tab rail, recessed behind the panel */
+
+  /* Chrome that is not expressed through utility classes */
+  --scrollbar-thumb:       rgb(var(--ui-700));
+  --scrollbar-thumb-hover: rgb(var(--ui-600));
+  --swatch-border:         rgb(var(--ui-700));
+}

@@ -1,0 +1,78 @@
+# markpublish.yaml
+#
+# Manual for the Brand Kit Generator, English edition.
+#
+# Build, from this directory:
+#
+#   markpublish build -o ../../../src/docs/manual/brand_kit_generator_en.pdf
+#
+# The target is deliberate: the app serves the PDF itself and links it in the
+# bottom left, following the interface language. The file name carries the
+# language code so the other editions can sit beside it. Without -o the build
+# would drop brand_kit_generator.pdf next to the sources - a second copy that
+# quietly goes stale.
+#
+# Every key at a glance: markpublish cheatsheet
+
+document:
+  title: "Brand Kit Generator"
+  subtitle: "Creating transparent overlays for social media"
+  author: "Frank Winter"
+  version: "1.1.0"
+  status: "Released"
+  date: "auto"
+  copyright: "© 2026 WASDCAT Games"
+  language: "en"
+  cover: true
+
+  document_toc: 2
+  part_toc: 1
+  chapter_toc: 2
+
+theme: "wasdcat"
+
+parts:
+  - part: "Getting started"
+    break_before: "divider"
+    chapters:
+      - file: "01-overview.md"
+        break_before: "page"
+        show_title: true
+      - file: "02-first-steps.md"
+        break_before: "page"
+        show_title: true
+      - file: "03-interface.md"
+        break_before: "page"
+        show_title: true
+
+  - part: "Working"
+    break_before: "divider"
+    chapters:
+      - file: "04-creating-a-post.md"
+        break_before: "page"
+        show_title: true
+      - file: "05-templates.md"
+        break_before: "page"
+        show_title: true
+      - file: "06-colour-sets.md"
+        break_before: "page"
+        show_title: true
+      - file: "07-fonts.md"
+        break_before: "page"
+        show_title: true
+      - file: "08-brand.md"
+        break_before: "page"
+        show_title: true
+
+  - part: "Results"
+    break_before: "divider"
+    chapters:
+      - file: "09-export.md"
+        break_before: "page"
+        show_title: true
+      - file: "10-saving-and-moving.md"
+        break_before: "page"
+        show_title: true
+      - file: "11-troubleshooting.md"
+        break_before: "page"
+        show_title: true

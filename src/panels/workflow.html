@@ -1,0 +1,188 @@
+<!--
+  AREA 1: CREATION
+
+  A fragment of the app template, not a standalone page. index.html has a
+  <div data-panel="workflow"> placeholder that app.js replaces with this file
+  before Vue mounts, so everything here is compiled as part of the one root
+  component and binds against the same setup() scope.
+-->
+<!-- ====================================================== -->
+<!-- AREA 1: CREATION                                       -->
+<!-- ====================================================== -->
+<div v-show="activeTab === 'workflow'" class="space-y-5">
+
+  <!-- Selection: product / template / font set / colour set -->
+  <div class="p-4 rounded-lg bg-ui-950/80 border border-ui-800 space-y-2.5">
+    <span class="text-[11px] font-bold text-ui-300 block">{{ t('wf.selection') }}</span>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-ui-400">{{ t('wf.product') }}</span>
+        <button @click="activeTab = 'products'" class="text-[10px] text-accent-400 hover:text-accent-300 transition shrink-0">{{ t('wf.edit') }}</button>
+      </div>
+      <select
+        v-model="selection.productId"
+        class="w-full bg-ui-950/80 border border-ui-700 text-ui-100 text-xs font-bold rounded-md px-3 py-2.5 focus:outline-none focus:border-accent-500 transition"
+      >
+        <option v-for="p in products" :key="p.id" :value="p.id">
+          {{ p.title }}
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-ui-400">{{ t('wf.template') }}</span>
+        <button @click="activeTab = 'template'" class="text-[10px] text-accent-400 hover:text-accent-300 transition shrink-0">{{ t('wf.edit') }}</button>
+      </div>
+      <select
+        v-model="selection.templateId"
+        class="w-full bg-ui-950/80 border border-ui-700 text-ui-100 text-xs font-bold rounded-md px-3 py-2.5 focus:outline-none focus:border-accent-500 transition"
+      >
+        <option v-for="tpl in templates" :key="tpl.id" :value="tpl.id">
+          {{ tpl.name }}
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-ui-400">{{ t('wf.fontset') }}</span>
+        <button
+          @click="editingFontSetId = selection.fontSetId; activeTab = 'fontset'"
+          class="text-[10px] text-accent-400 hover:text-accent-300 transition shrink-0"
+        >{{ t('wf.edit') }}</button>
+      </div>
+      <select
+        v-model="selection.fontSetId"
+        class="w-full bg-ui-950/80 border border-ui-700 text-ui-100 text-xs font-bold rounded-md px-3 py-2.5 focus:outline-none focus:border-accent-500 transition"
+      >
+        <option v-for="fs in fontSets" :key="fs.id" :value="fs.id">{{ fs.name }}</option>
+      </select>
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-ui-400">{{ t('wf.colorset') }}</span>
+        <button
+          @click="editingColorSetId = selection.colorSetId; activeTab = 'colorset'"
+          class="text-[10px] text-accent-400 hover:text-accent-300 transition shrink-0"
+        >{{ t('wf.edit') }}</button>
+      </div>
+      <select
+        v-model="selection.colorSetId"
+        class="w-full bg-ui-950/80 border border-ui-700 text-ui-100 text-xs font-bold rounded-md px-3 py-2.5 focus:outline-none focus:border-accent-500 transition"
+      >
+        <option v-for="cs in colorSets" :key="cs.id" :value="cs.id">
+          {{ cs.name }}
+        </option>
+      </select>
+      <div class="flex items-center gap-1 mt-1.5">
+        <span
+          v-for="role in COLOR_ROLES"
+          :key="role.key"
+          class="h-3 flex-1 rounded-sm border border-ui-800"
+          :style="{ backgroundColor: resolvedColors[role.key] }"
+          :title="roleLabel(role.key)"
+        ></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="p-4 rounded-lg bg-ui-950/80 border border-ui-800 space-y-3.5">
+    <span class="text-[11px] font-bold text-ui-300 block">{{ t('wf.content') }}</span>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-ui-400">{{ t('slot.title') }}</span>
+        <span v-if="!usesSlot('title')" class="text-[10px] text-warn-400/80">{{ t('wf.notUsed') }}</span>
+        <span v-else class="text-[10px] text-ui-500">{{ t('wf.characters', { count: (content.title || '').length }) }}</span>
+      </div>
+      <textarea
+        v-model="content.title"
+        rows="2"
+        :placeholder="t('wf.phTitle')"
+        class="w-full bg-ui-950/80 border border-ui-700 text-ui-100 text-sm font-medium rounded-md p-3 focus:outline-none focus:border-accent-500 transition resize-none"
+      ></textarea>
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-ui-400">{{ t('slot.subtitle') }}</span>
+        <span v-if="!usesSlot('subtitle')" class="text-[10px] text-warn-400/80">{{ t('wf.notUsed') }}</span>
+      </div>
+      <input
+        type="text"
+        v-model="content.subtitle"
+        :placeholder="t('wf.phSubtitle')"
+        class="w-full bg-ui-950/80 border border-ui-700 text-ui-200 text-xs rounded-md px-3 py-2.5 focus:outline-none focus:border-accent-500 transition"
+      />
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-ui-400">{{ t('slot.description') }}</span>
+        <span v-if="!usesSlot('description')" class="text-[10px] text-warn-400/80">{{ t('wf.notUsed') }}</span>
+      </div>
+      <textarea
+        v-model="content.description"
+        rows="2"
+        :placeholder="t('wf.phDescription')"
+        class="w-full bg-ui-950/80 border border-ui-700 text-ui-200 text-xs rounded-md p-3 focus:outline-none focus:border-accent-500 transition resize-none"
+      ></textarea>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2">
+      <div>
+        <div class="flex items-center justify-between gap-1 mb-1">
+          <span class="text-[11px] text-ui-400 flex items-center gap-1.5 min-w-0">
+            <span
+              class="w-2.5 h-2.5 rounded-full border border-ui-700 shrink-0"
+              :style="{ backgroundColor: resolvedColors[resolvedAssign.tag] }"
+              :title="t('wf.colourOf', { role: roleLabel(resolvedAssign.tag) })"
+            ></span>
+            <span class="truncate">{{ t('assign.tag') }}</span>
+          </span>
+          <span v-if="!usesSlot('tag')" class="text-[10px] text-warn-400/80 shrink-0">{{ t('wf.notIn') }}</span>
+        </div>
+        <input
+          type="text"
+          v-model="content.tag"
+          :placeholder="t('wf.phTag')"
+          class="w-full bg-ui-950/80 border border-ui-700 text-ui-200 text-xs rounded-md px-3 py-2 focus:outline-none focus:border-accent-500 uppercase transition"
+        />
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between gap-1 mb-1">
+          <span class="text-[11px] text-ui-400 flex items-center gap-1.5 min-w-0">
+            <span
+              class="w-2.5 h-2.5 rounded-full border border-ui-700 shrink-0"
+              :style="{ backgroundColor: resolvedColors[resolvedAssign.tag2] }"
+              :title="t('wf.colourOf', { role: roleLabel(resolvedAssign.tag2) })"
+            ></span>
+            <span class="truncate">{{ t('assign.tag2') }}</span>
+          </span>
+          <span v-if="!usesSlot('tag2')" class="text-[10px] text-warn-400/80 shrink-0">{{ t('wf.notIn') }}</span>
+        </div>
+        <input
+          type="text"
+          v-model="content.tag2"
+          :placeholder="t('wf.phTag2')"
+          class="w-full bg-ui-950/80 border border-ui-700 text-ui-200 text-xs rounded-md px-3 py-2 focus:outline-none focus:border-accent-500 uppercase transition"
+        />
+      </div>
+
+      <p class="col-span-2 text-[10px] text-ui-500 leading-relaxed">
+        {{ t('wf.tagNote') }}
+        <button
+          @click="editingColorSetId = selection.colorSetId; activeTab = 'colorset'"
+          class="text-accent-400 hover:text-accent-300 transition"
+        >{{ t('wf.tagNoteLink') }}</button>
+      </p>
+    </div>
+
+
+  </div>
+</div>

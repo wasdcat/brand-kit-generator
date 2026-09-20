@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Lower Third</title>
+  <meta name="description" content="Lower third with a branding line (product), up to two tags, title, product logo and copyright line.">
+  <meta name="category" content="Video &amp; Stream">
+  <link rel="stylesheet" href="../fonts/fonts.css">
+  <style>
+    /* =====================================================================
+       VALUES COMING FROM THE APP
+       ---------------------------------------------------------------------
+       Opening this file directly uses the sample values below. Inside the app
+       they get overwritten:
+         --color-*       from the selected colour set
+         --tag-color     which colour role a tag chip uses (colour set)
+         --font-<slot>   family, -weight and -axes per placeholder, from the font
+                         set and the mapping in the Template area. A namespaced
+                         slot loses its dot: product.title -> --font-product-title
+         data-format     "1:1" | "4:5" | "9:16" | "16:9" (plus width/height of .frame)
+
+       The sizes stay here on purpose: they are tuned per element and per format
+       (see the 4:5 block further down) and cannot come from a single number.
+
+       Every font declaration keeps the value it had as a fallback, so this file
+       still looks right on its own. Note that the `font:` shorthand is avoided
+       throughout - it resets font-variation-settings, which would silently throw
+       away the axis values of a variation.
+       ===================================================================== */
+    .frame {
+      --color-background: #180c26;
+      --color-accent: #facc15;
+      --color-secondary: #c084fc;
+      --color-border: #a855f7;
+      --color-text: #ffffff;
+      --color-subtext: #e9d5ff;
+      --color-description: #c084fc;
+
+      --font-base: "Inter";
+    }
+
+    /* =====================================================================
+       THE DESIGN OF THIS TEMPLATE
+       ===================================================================== */
+    .frame {
+      /* Font sizes: baseline for 16:9 (1920 px wide).
+         Narrower formats override them further down. */
+      --fs-title: 34px;
+      --fs-product: 20px;
+      --fs-tag: calc(var(--fs-product) * 0.9);   /* tied to the product title, only slightly smaller */
+      --fs-copyright: 14px;
+      --brand-gap: 14px;
+
+      /* Fixed height for the branding line so the bar does not jump when a tag
+         or the product title is missing. The value is the height of a tag chip:
+         cap height (0.727em) + 2 x 0.58em padding = 1.887 x --fs-tag, and
+         --fs-tag is 0.9 x --fs-product. */
+      --brand-height: calc(var(--fs-product) * 1.7);
+
+      /* Rule between title and copyright line */
+      --rule-width: 2px;
+      --rule-color: color-mix(in srgb, var(--color-subtext) 45%, transparent);
+
+      /* Box */
+      --box-opacity: 90%;
+      --radius: 0px;
+      --margin-x: 0px;
+      --margin-bottom: 0px;
+      --padding-x: 20px;
+      --padding-y: 25px;
+      --gap: 6px;
+
+      /* Border: every side on its own */
+      --border-top: 8px;
+      --border-right: 0px;
+      --border-bottom: 0px;
+      --border-left: 0px;
+
+      /* Border fill: a gradient ...                                                    */
+      --border-fill: linear-gradient(to left, var(--color-border), var(--color-secondary), var(--color-accent));
+      /* ... or plain:  --border-fill: var(--color-border);                             */
+
+      /* Product logo */
+      --logo-size: 128px;
+      --logo-radius: 12px;
+
+      /* Shadow: starts at the top edge of the lower third and fades upwards */
+      --shadow-height: 33.333cqh;  /* cqh = percent of the frame height */
+      --shadow-opacity: 0.7;       /* opacity at the lower third (0 = no shadow) */
+
+      container-type: size;        /* makes cqh relate to the frame height */
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      font-family: var(--font-base), sans-serif;
+    }
+
+    /* 9:16 sits at the bottom edge like every format. To keep the lower third
+       above the caption zone of vertical full-screen posts, enable this line:
+       .frame[data-format="9:16"] { --margin-bottom: 260px; } */
+
+    /* 4:5 portrait (1080 x 1350): half as wide as 16:9 and shown small
+       in the feed, hence larger type throughout. The steps are:
+       title 48 -> product 24 (tag follows at 21.6) -> copyright 20. Nothing drops
+       below 20 px, and the title stays the largest voice by a clear margin.
+       For 1:1 and 9:16 (also 1080 px wide) extend the selector. */
+    .frame[data-format="4:5"] {
+      --fs-title: 48px;
+      --fs-product: 24px;
+      --fs-copyright: 20px;
+      --brand-gap: 20px;
+
+      --padding-x: 32px;
+      --padding-y: 32px;
+      --gap: 10px;
+      --border-top: 10px;
+      --logo-size: 144px;
+    }
+
+    /* ---- Box ------------------------------------------------------------ */
+    .lower-third {
+      position: absolute;
+      left: var(--margin-x);
+      right: var(--margin-x);
+      bottom: var(--margin-bottom);
+      display: flex;
+      align-items: center;
+      gap: var(--padding-x);
+      padding:
+        calc(var(--border-top) + var(--padding-y))
+        calc(var(--border-right) + var(--padding-x))
+        calc(var(--border-bottom) + var(--padding-y))
+        calc(var(--border-left) + var(--padding-x));
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--color-background) var(--box-opacity), transparent);
+    }
+
+    /* Border as a masked-out area: four sides individually, gradient possible, follows the radius */
+    .lower-third::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: var(--border-top) var(--border-right) var(--border-bottom) var(--border-left);
+      background: var(--border-fill);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* ---- Shadow --------------------------------------------------------- */
+    /* Sits directly above the lower third and spans the full frame width.
+       The many stops produce a soft fade without a visible edge. */
+    .lower-third::after {
+      content: "";
+      position: absolute;
+      bottom: 100%;
+      left: calc(-1 * var(--margin-x));
+      right: calc(-1 * var(--margin-x));
+      height: var(--shadow-height);
+      pointer-events: none;
+      background: linear-gradient(to top,
+        rgb(0 0 0 / calc(var(--shadow-opacity) * 1))     0%,
+        rgb(0 0 0 / calc(var(--shadow-opacity) * 0.738)) 19%,
+        rgb(0 0 0 / calc(var(--shadow-opacity) * 0.541)) 34%,
+        rgb(0 0 0 / calc(var(--shadow-opacity) * 0.382)) 47%,
+        rgb(0 0 0 / calc(var(--shadow-opacity) * 0.278)) 56.5%,
+        rgb(0 0 0 / calc(var(--shadow-opacity) * 0.194)) 65%,
+        rgb(0 0 0 / calc(var(--shadow-opacity) * 0.126)) 73%,
+        rgb(0 0 0 / calc(var(--shadow-opacity) * 0.075)) 80.2%,
+        rgb(0 0 0 / calc(var(--shadow-opacity) * 0.042)) 86.1%,
+        rgb(0 0 0 / calc(var(--shadow-opacity) * 0.021)) 91%,
+        rgb(0 0 0 / calc(var(--shadow-opacity) * 0.008)) 95.2%,
+        rgb(0 0 0 / 0) 100%);
+    }
+
+    .text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+    }
+
+    /* ---- Branding line (product in the product font) --------------------- */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: var(--brand-gap);
+      height: var(--brand-height);
+      text-transform: uppercase;
+    }
+    .brand-product {
+      font-family: var(--font-product-title, "Orbitron"), sans-serif;
+      font-weight: var(--font-product-title-weight, 900);
+      font-variation-settings: var(--font-product-title-axes, normal);
+      font-size: var(--fs-product);
+      line-height: 1.2;
+      color: var(--color-accent);
+      white-space: nowrap;
+    }
+
+    /* The tags sit directly behind the product title, each spaced by --brand-gap.
+       An empty tag disappears (rule at the very bottom) and takes its gap with it. */
+    .tag {
+      flex: none;
+      padding: 0.58em 0.78em;    /* top/bottom from the cap height, holds the chip height */
+      border-radius: 0.46em;
+      color: var(--color-background);
+      font-size: var(--fs-tag);
+      line-height: 1.1;
+    }
+    .tag-1 {
+      font-family: var(--font-tag, "Inter"), sans-serif;
+      font-weight: var(--font-tag-weight, 700);
+      font-variation-settings: var(--font-tag-axes, normal);
+    }
+    .tag-2 {
+      font-family: var(--font-tag2, "Inter"), sans-serif;
+      font-weight: var(--font-tag2-weight, 700);
+      font-variation-settings: var(--font-tag2-axes, normal);
+    }
+
+    /* The chip colour comes from the assignment in the colour set (which role a
+       tag uses is picked there). The value after the comma applies when this
+       file is opened directly and for colour sets without an assignment. */
+    .tag-1 { background: var(--tag-color, var(--color-accent)); }
+    .tag-2 { background: var(--tag2-color, var(--color-secondary)); }
+
+    /* Product title and tag share one centre line: text-box trims both boxes to
+       the cap height at the top and to the baseline at the bottom. align-items:
+       center then centres the capitals themselves instead of the box, in which
+       two different typefaces leave different amounts of air above and below the
+       text. Without support it falls back to centring the box. */
+    .brand-product,
+    .tag {
+      text-box: trim-both cap alphabetic;
+    }
+
+    /* ---- Content -------------------------------------------------------- */
+    .title {
+      font-family: var(--font-title, "Recursive"), sans-serif;
+      font-weight: var(--font-title-weight, 800);
+      font-variation-settings: var(--font-title-axes, normal);
+      font-size: var(--fs-title);
+      line-height: 1.25;
+      color: var(--color-text);
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+    /* Copyright line: right-aligned under a thin rule and held back in
+       brightness so it does not compete with the title. Without input the
+       element is empty and gets hidden - the rule disappears with it. The space
+       above the rule comes from the --gap of the text column, the space below
+       from padding-top, so the rule sits centred between title and line. */
+    .copyright {
+      border-top: var(--rule-width) solid var(--rule-color);
+      padding-top: var(--gap);
+      text-align: right;
+      font-family: var(--font-company-copyright, "Inter"), sans-serif;
+      font-weight: var(--font-company-copyright-weight, 400);
+      font-variation-settings: var(--font-company-copyright-axes, normal);
+      font-size: var(--fs-copyright);
+      line-height: 1.35;
+      color: color-mix(in srgb, var(--color-subtext) 55%, transparent);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .logo {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      border-radius: var(--logo-radius);
+      object-fit: contain;
+      flex: none;
+    }
+
+    /* Only for viewing this file directly; the app makes the background transparent */
+    body { margin: 0; background: #3b4a5c; }
+    [data-slot]:not(img):empty { display: none; }
+  </style>
+</head>
+<body>
+  <div class="frame" data-format="16:9">
+    <div class="lower-third">
+      <img class="logo" data-slot="product.logo" alt="" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23a855f7'/%3E%3C/svg%3E">
+      <div class="text">
+        <div class="brand">
+          <span class="brand-product" data-slot="product.title">Pod Rush</span>
+          <span class="tag tag-1" data-slot="tag">Podcast #42</span>
+          <span class="tag tag-2" data-slot="tag2">Update</span>
+        </div>
+        <div class="title" data-slot="title">Episode #42: The Ray Tracing Future</div>
+        <div class="copyright" data-slot="company.copyright">&copy; WASDCAT</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

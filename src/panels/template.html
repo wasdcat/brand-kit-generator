@@ -1,0 +1,156 @@
+<!--
+  AREA 2: TEMPLATE
+
+  A fragment of the app template, not a standalone page. index.html has a
+  <div data-panel="template"> placeholder that app.js replaces with this file
+  before Vue mounts, so everything here is compiled as part of the one root
+  component and binds against the same setup() scope.
+-->
+<!-- ====================================================== -->
+<!-- AREA 2: TEMPLATE                                       -->
+<!-- ====================================================== -->
+<div v-show="activeTab === 'template'" class="space-y-5">
+
+  <div class="space-y-2">
+    <span class="text-xs font-bold text-ui-200 uppercase tracking-wider block">{{ t('tp.heading') }}</span>
+    <select
+      v-model="selection.templateId"
+      class="w-full bg-ui-950/80 border border-ui-700 text-ui-100 text-xs font-bold rounded-md px-3 py-2.5 focus:outline-none focus:border-accent-500 transition"
+    >
+      <option v-for="tpl in templates" :key="tpl.id" :value="tpl.id">
+        {{ tpl.name }}<template v-if="tpl.category"> &mdash; {{ tpl.category }}</template>
+      </option>
+    </select>
+
+    <p v-if="activeTemplate.description" class="text-[10px] text-ui-500 leading-relaxed">{{ activeTemplate.description }}</p>
+
+    <div
+      v-if="activeTemplate.error"
+      class="p-2.5 rounded bg-danger-500/10 border border-danger-500/30 text-danger-300 text-[11px] leading-relaxed"
+    >
+      {{ activeTemplate.error }}
+    </div>
+
+    <!-- Removing takes the entry out of the catalogue; the file under
+         templates/ stays untouched and the button below brings it back. -->
+    <div class="flex items-center gap-2 pt-1">
+      <span class="flex-1 text-[10px] text-ui-500 font-mono break-all">src/{{ activeTemplate.file }}</span>
+      <button
+        v-if="canRemoveTemplate"
+        @click="askConfirm('remove-template', () => removeTemplate(activeTemplate.id))"
+        class="px-3 py-2 rounded border text-[11px] font-medium transition shrink-0"
+        :class="pendingConfirm === 'remove-template'
+          ? 'bg-danger-500/25 border-danger-500/50 text-danger-200'
+          : 'bg-ui-800 hover:bg-danger-500/20 border-ui-700 hover:border-danger-500/40 text-danger-400'"
+        :title="pendingConfirm === 'remove-template'
+          ? t('tp.removeArmed')
+          : t('tp.removeTitle')"
+      >
+        {{ pendingConfirm === 'remove-template' ? t('common.sure') : t('common.remove') }}
+      </button>
+    </div>
+
+    <div
+      v-if="removedTemplates.length"
+      class="p-2.5 rounded bg-ui-900 border border-ui-800 flex items-start gap-2.5"
+    >
+      <div class="flex-1 min-w-0 space-y-0.5">
+        <span class="text-[11px] text-ui-300 block">
+          {{ t('tp.removed', { names: removedTemplates.map(tpl => tpl.name).join(', ') }) }}
+        </span>
+        <span class="text-[10px] text-ui-500 block leading-relaxed">
+          {{ t('tp.removedNote') }}
+        </span>
+      </div>
+      <button
+        @click="restoreTemplates"
+        class="px-2.5 py-1.5 rounded bg-ui-800 hover:bg-ui-700 border border-ui-700 text-ui-200 text-[11px] font-medium transition shrink-0 flex items-center gap-1.5"
+      >
+        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+        <span>{{ t('common.restore') }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Placeholders -->
+  <div class="p-4 rounded-lg bg-ui-950/80 border border-ui-800 space-y-2.5">
+    <span class="text-[11px] font-bold text-ui-300 block">{{ t('tp.placeholders') }}</span>
+    <div class="flex flex-wrap gap-1.5">
+      <span
+        v-for="slot in SLOTS"
+        :key="slot.key"
+        class="px-2 py-0.5 rounded-sm text-[10px] font-mono border"
+        :class="usesSlot(slot.key) ? 'bg-accent-500/15 border-accent-500/40 text-accent-200' : 'bg-ui-900 border-ui-800 text-ui-600'"
+        :title="slotLabel(slot.key) + ' (' + slotSource(slot.source) + ')'"
+      >
+        {{ slot.key }}
+      </span>
+    </div>
+    <p
+      v-if="activeTemplate.unknownSlots.length"
+      class="text-[10px] text-warn-400 leading-relaxed"
+    >
+      {{ t('tp.unknownSlots', { list: activeTemplate.unknownSlots.join(', ') }) }}
+    </p>
+  </div>
+
+  <!-- Typography: variation and weight per placeholder -->
+  <div class="p-4 rounded-lg bg-ui-950/80 border border-ui-800 space-y-2.5">
+    <div class="flex items-center justify-between">
+      <span class="text-[11px] font-bold text-ui-300">{{ t('tp.typography') }}</span>
+      <button
+        @click="editingFontSetId = selection.fontSetId; activeTab = 'fontset'"
+        class="text-[10px] text-accent-400 hover:text-accent-300 transition"
+      >
+        {{ activeFontSet.name }} &rarr;
+      </button>
+    </div>
+    <p class="text-[10px] text-ui-500 leading-relaxed">
+      Which variation and which weight each placeholder uses. The size stays in the
+      CSS of the template &ndash; it is tuned per element and per format.
+    </p>
+
+    <div v-if="typoRows.length" class="grid grid-cols-[1fr_7.5rem_3.5rem] gap-x-2 gap-y-1.5 items-center">
+      <span class="text-[9px] text-ui-500 uppercase tracking-wider">{{ t('tp.colPlaceholder') }}</span>
+      <span class="text-[9px] text-ui-500 uppercase tracking-wider">{{ t('tp.colVariation') }}</span>
+      <span class="text-[9px] text-ui-500 uppercase tracking-wider text-right">{{ t('tp.colWeight') }}</span>
+
+      <template v-for="r in typoRows" :key="r.key">
+        <code class="text-[10px] text-ui-300 font-mono truncate" :title="r.label">{{ r.key }}</code>
+        <select
+          v-model="r.row.variation"
+          @change="normalizeTypography"
+          class="bg-ui-900 border border-ui-800 text-ui-200 text-[10px] rounded px-1.5 py-1 focus:outline-none focus:border-accent-500"
+        >
+          <option v-for="v in activeFontSet.variations" :key="v.id" :value="v.id">{{ v.name }}</option>
+        </select>
+        <input
+          type="number"
+          v-model.number="r.row.weight"
+          @change="normalizeTypography"
+          :min="r.min"
+          :max="r.max"
+          step="10"
+          :title="t('tp.supports', { font: r.font, min: r.min, max: r.max })"
+          class="bg-ui-900 border border-ui-800 text-ui-200 text-[10px] font-mono rounded px-1.5 py-1 text-right focus:outline-none focus:border-accent-500"
+        />
+      </template>
+    </div>
+    <p v-else class="text-[10px] text-warn-400/80 leading-relaxed">
+      {{ t('tp.noTextSlots') }}
+    </p>
+  </div>
+
+  <!-- Rules for templates -->
+  <div class="p-4 rounded-lg bg-ui-950/80 border border-ui-800 space-y-2">
+    <span class="text-[11px] font-bold text-ui-300 block">{{ t('tp.howBuilt') }}</span>
+    <ul class="text-[11px] text-ui-400 leading-relaxed space-y-1.5 list-disc pl-4">
+      <!-- Wording from i18n.js, never user input, so v-html is safe here -->
+      <li v-html="t('tp.how1')"></li>
+      <li v-html="t('tp.how2')"></li>
+      <li v-html="t('tp.how3')"></li>
+      <li v-html="t('tp.how4')"></li>
+      <li v-html="t('tp.how5')"></li>
+</ul>
+  </div>
+</div>

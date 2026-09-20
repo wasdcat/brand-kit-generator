@@ -1,0 +1,167 @@
+<!--
+  AREA 3b: FONT SET
+
+  A fragment of the app template, not a standalone page. index.html has a
+  <div data-panel="fontset"> placeholder that app.js replaces with this file
+  before Vue mounts, so everything here is compiled as part of the one root
+  component and binds against the same setup() scope.
+-->
+<!-- ====================================================== -->
+<!-- AREA 3b: FONT SET                                      -->
+<!-- ====================================================== -->
+<div v-show="activeTab === 'fontset'" class="space-y-5">
+
+  <div class="space-y-2">
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-bold text-ui-200 uppercase tracking-wider">{{ t('fs.heading') }}</span>
+      <button
+        @click="createFontSet"
+        class="px-2.5 py-1 rounded bg-accent-600 hover:bg-accent-500 text-white text-[11px] font-medium flex items-center gap-1 transition"
+      >
+        <i data-lucide="copy-plus" class="w-3.5 h-3.5"></i>
+        <span>{{ t('common.duplicate') }}</span>
+      </button>
+    </div>
+
+    <select
+      v-model="editingFontSetId"
+      class="w-full bg-ui-950/80 border border-ui-700 text-ui-100 text-xs font-bold rounded-md px-3 py-2.5 focus:outline-none focus:border-accent-500 transition"
+    >
+      <option v-for="fs in fontSets" :key="fs.id" :value="fs.id">{{ fs.name }}</option>
+    </select>
+
+    <div class="flex items-center gap-2 pt-1">
+      <button
+        v-if="editingFontSetId !== selection.fontSetId"
+        @click="applyFontSetToSelection"
+        class="flex-1 px-3 py-2 rounded bg-accent-600 hover:bg-accent-500 text-white text-[11px] font-semibold transition flex items-center justify-center gap-1.5"
+      >
+        <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+        <span>{{ t('common.showInPreview') }}</span>
+      </button>
+      <span
+        v-else
+        class="flex-1 px-3 py-2 rounded bg-ok-500/10 border border-ok-500/30 text-ok-300 text-[11px] font-semibold text-center"
+      >
+        {{ t('common.activeInPreview') }}
+      </span>
+      <button
+        @click="askConfirm('reset-fontset', resetFontSet)"
+        class="px-3 py-2 rounded border text-[11px] font-medium transition"
+        :class="pendingConfirm === 'reset-fontset'
+          ? 'bg-warn-500/20 border-warn-500/40 text-warn-300'
+          : 'bg-ui-800 hover:bg-ui-700 border-ui-700 text-ui-300'"
+      >
+        {{ pendingConfirm === 'reset-fontset' ? t('common.sure') : t('common.reset') }}
+      </button>
+      <button
+        v-if="!isDefault(editingFontSet.id)"
+        @click="askConfirm('delete-fontset', () => deleteFontSet(editingFontSet.id))"
+        class="px-3 py-2 rounded border text-[11px] font-medium transition"
+        :class="pendingConfirm === 'delete-fontset'
+          ? 'bg-danger-500/25 border-danger-500/50 text-danger-200'
+          : 'bg-ui-800 hover:bg-danger-500/20 border-ui-700 hover:border-danger-500/40 text-danger-400'"
+      >
+        {{ pendingConfirm === 'delete-fontset' ? t('common.sure') : t('common.delete') }}
+      </button>
+    </div>
+  </div>
+
+  <div class="p-4 rounded-lg bg-ui-950/80 border border-ui-800 space-y-4">
+    <div>
+      <span class="text-[11px] text-ui-400 block mb-1">{{ t('fs.name') }}</span>
+      <input
+        type="text"
+        v-model="editingFontSet.name"
+        :readonly="isDefault(editingFontSet.id)"
+        :title="isDefault(editingFontSet.id) ? t('common.defaultLocked') : ''"
+        :placeholder="t('fs.phName')"
+        class="w-full border text-xs font-bold rounded-md px-3 py-2 focus:outline-none"
+        :class="isDefault(editingFontSet.id)
+          ? 'bg-ui-900 border-ui-800 text-ui-500 cursor-not-allowed'
+          : 'bg-ui-800 border-ui-700 text-ui-100 focus:border-accent-500'"
+      />
+    </div>
+
+    <div class="space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-bold text-ui-300">{{ t('fs.variations') }}</span>
+        <button
+          @click="addVariation"
+          class="text-[10px] text-accent-400 hover:text-accent-300 transition"
+        >
+          + Add
+        </button>
+      </div>
+
+      <div
+        v-for="variation in editingFontSet.variations"
+        :key="variation.id"
+        class="p-2.5 rounded bg-ui-900 border border-ui-800 space-y-2"
+      >
+        <div class="flex items-center gap-2">
+          <input
+            type="text"
+            v-model="variation.name"
+            :readonly="isDefault(variation.id)"
+            :title="isDefault(variation.id) ? 'The default entry cannot be renamed or deleted - it is the fallback for every dropdown.' : ''"
+            class="flex-1 min-w-0 border text-[11px] font-semibold rounded px-2 py-1 focus:outline-none"
+            :class="isDefault(variation.id)
+              ? 'bg-ui-900 border-ui-800 text-ui-500 cursor-not-allowed'
+              : 'bg-ui-800 border-ui-700 text-ui-100 focus:border-accent-500'"
+          />
+          <button
+            v-if="!isDefault(variation.id)"
+            @click="askConfirm('delete-variation-' + variation.id, () => deleteVariation(variation.id))"
+            class="shrink-0 rounded transition text-[10px] font-semibold"
+            :class="pendingConfirm === 'delete-variation-' + variation.id
+              ? 'px-1.5 py-0.5 bg-danger-500/25 text-danger-200'
+              : 'text-danger-400 hover:text-danger-300'"
+            :title="t('fs.removeVariation')"
+          >
+            <span v-if="pendingConfirm === 'delete-variation-' + variation.id">{{ t('common.sure') }}</span>
+            <i v-else data-lucide="x" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <select
+          :value="variation.font"
+          @change="setVariationFont(variation, $event.target.value)"
+          class="w-full bg-ui-800 border border-ui-700 text-ui-200 text-[11px] rounded px-2 py-1.5 focus:outline-none focus:border-accent-500"
+        >
+          <option v-for="font in FONTS" :key="font.id" :value="font.id">{{ font.name }}</option>
+        </select>
+
+        <div v-if="fontAxes(variation.font).length" class="space-y-1 pt-0.5">
+          <div
+            v-for="axis in fontAxes(variation.font)"
+            :key="axis.tag"
+            class="flex items-center gap-2"
+          >
+            <span
+              class="text-[10px] text-ui-400 w-20 shrink-0 truncate"
+              :title="axisHint(axis.tag) + '  (' + axis.tag + ')'"
+            >{{ axisLabel(axis.tag) }}</span>
+            <input
+              type="range"
+              :min="axis.min"
+              :max="axis.max"
+              :step="axis.step"
+              v-model.number="variation.axes[axis.tag]"
+              class="flex-1 min-w-0 accent-accent-500"
+            />
+            <span class="text-[10px] text-ui-300 font-mono w-9 text-right shrink-0">{{ variation.axes[axis.tag] }}</span>
+          </div>
+        </div>
+        <p v-else class="text-[10px] text-ui-600 leading-relaxed">
+          {{ t('fs.weightOnly') }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-[10px] text-ui-500 leading-relaxed px-1">
+    {{ t('fs.note') }}
+    <button @click="activeTab = 'template'" class="text-accent-400 hover:text-accent-300 transition">{{ t('fs.noteLink') }}</button>{{ t('fs.noteAfter') }}
+  </p>
+</div>

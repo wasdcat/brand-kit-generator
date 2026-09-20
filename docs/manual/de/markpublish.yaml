@@ -1,0 +1,77 @@
+# markpublish.yaml
+#
+# Handbuch zum Brand Kit Generator, deutsche Fassung.
+#
+# Bauen, aus diesem Verzeichnis heraus:
+#
+#   markpublish build -o ../../../src/docs/manual/brand_kit_generator_de.pdf
+#
+# Das Ziel ist Absicht: die Anwendung liefert das PDF selbst aus und verlinkt es
+# unten links. Der Dateiname traegt das Sprachkuerzel, damit weitere Fassungen
+# daneben liegen koennen. Ohne -o entstuende brand_kit_generator.pdf neben den
+# Quellen - das waere ein zweites, veraltendes Exemplar.
+#
+# Alle Schlüssel im Überblick: markpublish cheatsheet
+
+document:
+  title: "Brand Kit Generator"
+  subtitle: "Transparente Overlays für Social Media erstellen"
+  author: "Frank Winter"
+  version: "1.1.0"
+  status: "Freigegeben"
+  date: "auto"
+  copyright: "© 2026 WASDCAT Games"
+  language: "de"
+  cover: true
+
+  document_toc: 2
+  part_toc: 1
+  chapter_toc: 2
+
+theme: "wasdcat"
+
+parts:
+  - part: "Einstieg"
+    break_before: "divider"
+    chapters:
+      - file: "01-ueberblick.md"
+        break_before: "page"
+        show_title: true
+      - file: "02-erste-schritte.md"
+        break_before: "page"
+        show_title: true
+      - file: "03-oberflaeche.md"
+        break_before: "page"
+        show_title: true
+
+  - part: "Arbeiten"
+    break_before: "divider"
+    chapters:
+      - file: "04-post-erstellen.md"
+        break_before: "page"
+        show_title: true
+      - file: "05-templates.md"
+        break_before: "page"
+        show_title: true
+      - file: "06-farbsets.md"
+        break_before: "page"
+        show_title: true
+      - file: "07-schriften.md"
+        break_before: "page"
+        show_title: true
+      - file: "08-marke.md"
+        break_before: "page"
+        show_title: true
+
+  - part: "Ergebnis"
+    break_before: "divider"
+    chapters:
+      - file: "09-export.md"
+        break_before: "page"
+        show_title: true
+      - file: "10-sichern-uebertragen.md"
+        break_before: "page"
+        show_title: true
+      - file: "11-fehlerbehebung.md"
+        break_before: "page"
+        show_title: true

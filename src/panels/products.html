@@ -1,0 +1,104 @@
+<!--
+  AREA 4: PRODUCTS
+
+  A fragment of the app template, not a standalone page. index.html has a
+  <div data-panel="products"> placeholder that app.js replaces with this file
+  before Vue mounts, so everything here is compiled as part of the one root
+  component and binds against the same setup() scope.
+-->
+<!-- ====================================================== -->
+<!-- AREA 4: PRODUCTS                                       -->
+<!-- ====================================================== -->
+<div v-show="activeTab === 'products'" class="space-y-5">
+
+  <div class="flex items-center justify-between">
+    <span class="text-xs font-bold text-ui-200 uppercase tracking-wider">{{ t('pr.heading') }}</span>
+    <div class="flex items-center gap-1.5">
+      <button
+        @click="duplicateProduct"
+        class="px-2.5 py-1 rounded bg-ui-800 hover:bg-ui-700 border border-ui-700 text-ui-300 text-[11px] font-medium transition"
+      >
+        {{ t('common.duplicate') }}
+      </button>
+      <button
+        @click="createNewProduct"
+        class="px-2.5 py-1 rounded bg-accent-600 hover:bg-accent-500 text-white text-[11px] font-medium flex items-center gap-1 transition"
+      >
+        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+        <span>{{ t('common.new') }}</span>
+      </button>
+    </div>
+  </div>
+
+  <select
+    v-model="selection.productId"
+    class="w-full bg-ui-950/80 border border-ui-700 text-ui-100 text-xs font-bold rounded-md px-3 py-2.5 focus:outline-none focus:border-accent-500 transition"
+  >
+    <option v-for="p in products" :key="p.id" :value="p.id">{{ p.title }}</option>
+  </select>
+
+  <div class="p-4 rounded-lg bg-ui-950/80 border border-ui-800 space-y-4">
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-bold text-accent-400">{{ t('pr.edit') }}</span>
+      <button
+        v-if="!isDefault(activeProduct.id)"
+        @click="askConfirm('delete-product', () => deleteProduct(activeProduct.id))"
+        class="text-[11px] transition rounded"
+        :class="pendingConfirm === 'delete-product'
+          ? 'px-1.5 py-0.5 bg-danger-500/25 text-danger-200 font-semibold'
+          : 'text-danger-400 hover:text-danger-300'"
+      >
+        {{ pendingConfirm === 'delete-product' ? 'Sure?' : 'Delete' }}
+      </button>
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-ui-400">{{ t('pr.title') }}</span>
+        <span v-if="!usesSlot('product.title')" class="text-[10px] text-warn-400/80">{{ t('wf.notUsed') }}</span>
+      </div>
+      <input
+        type="text"
+        v-model="activeProduct.title"
+        :readonly="isDefault(activeProduct.id)"
+        :title="isDefault(activeProduct.id) ? t('common.defaultLocked') : ''"
+        :placeholder="t('pr.phTitle')"
+        class="w-full border text-xs font-bold rounded-md px-3 py-2 focus:outline-none"
+        :class="isDefault(activeProduct.id)
+          ? 'bg-ui-900 border-ui-800 text-ui-500 cursor-not-allowed'
+          : 'bg-ui-800 border-ui-700 text-ui-100 focus:border-accent-500'"
+      />
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-ui-400">{{ t('pr.slogan') }}</span>
+        <span v-if="!usesSlot('product.slogan')" class="text-[10px] text-warn-400/80">{{ t('wf.notUsed') }}</span>
+      </div>
+      <input
+        type="text"
+        v-model="activeProduct.slogan"
+        :placeholder="t('pr.phSlogan')"
+        class="w-full bg-ui-800 border border-ui-700 text-ui-200 text-xs rounded-md px-3 py-2 focus:outline-none focus:border-accent-500"
+      />
+    </div>
+
+
+
+    <div class="space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] text-ui-400">{{ t('pr.logo') }}</span>
+        <span v-if="!usesSlot('product.logo')" class="text-[10px] text-warn-400/80">{{ t('wf.notUsed') }}</span>
+      </div>
+      <div class="flex items-center justify-between p-2.5 rounded bg-ui-900 border border-ui-800 gap-3">
+        <div class="w-10 h-10 rounded bg-ui-800 p-1 flex items-center justify-center overflow-hidden border border-ui-700 shrink-0">
+          <img v-if="activeProduct.logo" :src="activeProduct.logo" alt="Logo" class="max-w-full max-h-full object-contain" />
+        </div>
+        <label class="px-3 py-1.5 rounded bg-accent-600 hover:bg-accent-500 text-white text-xs font-medium cursor-pointer transition">
+          {{ t('pr.changeLogo') }}
+          <input type="file" accept="image/*,.svg" class="hidden" @change="handleProductLogoUpload" />
+        </label>
+      </div>
+    </div>
+  </div>
+</div>

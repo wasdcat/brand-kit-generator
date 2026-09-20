@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brand Kit Generator &middot; WASDCAT Games</title>
+
+    <link rel="icon" type="image/webp" href="assets/logo/wasdcat_bkg_logo.webp">
+
+    <!-- Bundled fonts: the same stylesheet the templates link, nothing from a CDN -->
+    <link rel="stylesheet" href="fonts/fonts.css">
+
+    <!-- Interface theme. A stylesheet, not a form: the app only swaps the file. -->
+    <link id="theme-stylesheet" rel="stylesheet" href="theme/dark.css">
+
+    <!-- Tailwind CSS (bundled vendor) -->
+    <script src="vendor/tailwindcss.js"></script>
+    <script>
+      // The palette lives in theme/*.css as RGB triples. Naming them here with
+      // the <alpha-value> placeholder keeps the opacity modifiers in the markup
+      // working (bg-ui-950/80 and friends).
+      const themed = (name, shades) => Object.fromEntries(
+        shades.map(shade => [shade, `rgb(var(--${name}-${shade}) / <alpha-value>)`]));
+
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Open Sans', 'sans-serif'],
+            },
+            colors: {
+              ui:     themed('ui',     [100, 200, 300, 400, 500, 600, 700, 800, 900, 950]),
+              accent: themed('accent', [200, 300, 400, 500, 600]),
+              warn:   themed('warn',   [200, 300, 400, 500]),
+              danger: themed('danger', [200, 300, 400, 500]),
+              ok:     themed('ok',     [200, 300, 400, 500]),
+              info:   themed('info',   [400, 500]),
+              rail:   'rgb(var(--rail) / <alpha-value>)'
+            },
+            borderRadius: {
+              DEFAULT: '3px',
+              sm: '2px',
+              md: '4px',
+              lg: '6px'
+            }
+          }
+        }
+      }
+    </script>
+
+    <!-- Vue 3 Global Runtime (bundled vendor) -->
+    <script src="vendor/vue.global.prod.js"></script>
+
+    <!-- JSZip for Client-Side ZIP Packaging (bundled vendor) -->
+    <script src="vendor/jszip.min.js"></script>
+
+    <!-- Lucide Icons (bundled vendor) -->
+    <script src="vendor/lucide.min.js"></script>
+
+    <style>
+      /* Checkerboard Transparenz-Muster */
+      .transparency-grid {
+        background-color: #0f172a;
+        background-image:
+          linear-gradient(45deg, #1e293b 25%, transparent 25%),
+          linear-gradient(-45deg, #1e293b 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, #1e293b 75%),
+          linear-gradient(-45deg, transparent 75%, #1e293b 75%);
+        background-size: 24px 24px;
+        background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+      }
+      .transparency-grid-light {
+        background-color: #ffffff;
+        background-image:
+          linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+          linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
+          linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+        background-size: 24px 24px;
+        background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+      }
+      /* Custom Scrollbars */
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 2px; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+
+      input[type="color"] {
+        -webkit-appearance: none;
+        appearance: none;
+        padding: 0;
+        border: none;
+        background: transparent;
+      }
+      input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+      input[type="color"]::-webkit-color-swatch { border: 1px solid var(--swatch-border); border-radius: 3px; }
+
+      /* Hide raw Vue placeholders until mounted */
+      [v-cloak] { display: none !important; }
+    </style>
+  </head>
+  <body class="bg-ui-950 text-ui-100 min-h-screen antialiased selection:bg-accent-500 selection:text-white overflow-hidden">
+    <div id="app" v-cloak class="flex flex-col h-screen w-screen overflow-hidden">
+
+    <!-- Menu icons. Drawn for this app rather than taken from a generic set: at
+         18px a lower-third frame says "template" and three chips say "colour set"
+         in a way that a page icon or a palette does not. Geometry matches the
+         Lucide icons used elsewhere - 24x24, stroked, no fill, round joins -
+         so the two sit together without clashing. -->
+    <svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
+      <defs>
+        <!-- Creation: a pencil, the one area where something is written -->
+        <symbol id="i-compose" viewBox="0 0 24 24">
+          <path d="M16.2 3.6 20.4 7.8 8.1 20.1 3 21l0.9-5.1z" />
+          <path d="M14.1 5.7 18.3 9.9" />
+        </symbol>
+
+        <!-- Export: out of the app and into a file -->
+        <symbol id="i-export" viewBox="0 0 24 24">
+          <path d="M12 3.5v11" />
+          <path d="M7.8 10.3 12 14.5l4.2-4.2" />
+          <path d="M4 16.5v3A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.5-1.5v-3" />
+        </symbol>
+
+        <!-- Template: a frame with a lower third along the bottom -->
+        <symbol id="i-template" viewBox="0 0 24 24">
+          <rect x="2.5" y="4.5" width="19" height="15" rx="1.5" />
+          <path d="M2.5 14h19" />
+          <path d="M5.5 16.8h7" />
+        </symbol>
+
+        <!-- Font set: an Aa. A capital next to a vertical bar read as "AI". -->
+        <symbol id="i-type" viewBox="0 0 24 24">
+          <path d="M2.2 17.8 7.1 6.2l4.9 11.6" />
+          <path d="M4.1 13.6h6" />
+          <circle cx="17.6" cy="14.2" r="3.7" />
+          <path d="M21.3 10.5v7.3" />
+        </symbol>
+
+        <!-- Colour set: a row of swatches, not a painter's palette -->
+        <symbol id="i-swatches" viewBox="0 0 24 24">
+          <rect x="2.5" y="7.8" width="5.7" height="8.4" rx="1.3" />
+          <rect x="9.15" y="7.8" width="5.7" height="8.4" rx="1.3" />
+          <rect x="15.8" y="7.8" width="5.7" height="8.4" rx="1.3" />
+        </symbol>
+
+        <!-- Products: several items side by side -->
+        <symbol id="i-products" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="8" height="8" rx="1.5" />
+          <rect x="13" y="3" width="8" height="8" rx="1.5" />
+          <rect x="3" y="13" width="8" height="8" rx="1.5" />
+          <rect x="13" y="13" width="8" height="8" rx="1.5" />
+        </symbol>
+
+        <!-- Company: the house the brand belongs to -->
+        <symbol id="i-company" viewBox="0 0 24 24">
+          <path d="M3 21h18" />
+          <path d="M5.5 21V4.8A1.3 1.3 0 0 1 6.8 3.5h6.4a1.3 1.3 0 0 1 1.3 1.3V21" />
+          <path d="M14.5 10.5h3.7a1.3 1.3 0 0 1 1.3 1.3V21" />
+          <path d="M8.4 7.5h3.2" />
+          <path d="M8.4 11.5h3.2" />
+          <path d="M8.4 15.5h3.2" />
+        </symbol>
+      </defs>
+    </svg>
+
+
+      <!-- ============================================== -->
+      <!-- TOP NAVIGATION BAR                             -->
+      <!-- ============================================== -->
+      <header class="h-16 border-b border-ui-800 bg-ui-900/90 backdrop-blur px-4 lg:px-6 flex items-center justify-between z-30 shrink-0">
+        <div class="flex items-center gap-3">
+          <!-- No frame. The dark backing is not decoration: the artwork is white on
+               transparent, and the header is light in the light theme - without it
+               the wordmark would disappear there. A logo with dark lettering could
+               drop the backing and sit on the header directly. -->
+          <div class="w-10 h-10 rounded-md bg-[#15171a] overflow-hidden shrink-0">
+            <img
+              src="assets/logo/wasdcat_bkg_logo.webp"
+              :alt="t('app.title')"
+              class="w-full h-full object-contain"
+              width="40"
+              height="40"
+            />
+          </div>
+          <div>
+            <h1 class="text-base font-bold text-ui-100 tracking-wide">
+              Brand Kit Generator
+            </h1>
+            <p class="text-[11px] text-ui-400">
+              by <a
+                href="https://www.wasdcat.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-ui-200 underline decoration-ui-700 hover:decoration-ui-400 underline-offset-2 transition"
+              >WASDCAT Games</a>
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Utility Buttons -->
+        <div class="flex items-center gap-2">
+          <label class="px-3 py-1.5 rounded bg-ui-800 hover:bg-ui-700 text-ui-200 text-xs font-medium cursor-pointer border border-ui-700 flex items-center gap-1.5 transition">
+            <i data-lucide="upload" class="w-3.5 h-3.5 text-ui-400"></i>
+            <span class="hidden md:inline">{{ t('header.load') }}</span>
+            <input type="file" accept=".json" class="hidden" @change="importConfigJson" />
+          </label>
+
+          <button
+            @click="exportConfigJson"
+            class="px-3 py-1.5 rounded bg-ui-800 hover:bg-ui-700 text-ui-200 text-xs font-medium border border-ui-700 flex items-center gap-1.5 transition"
+            :title="t('header.saveTitle')"
+          >
+            <i data-lucide="folder-down" class="w-3.5 h-3.5 text-ui-400"></i>
+            <span class="hidden md:inline">{{ t('header.save') }}</span>
+          </button>
+
+          <button
+            @click="toggleTheme"
+            class="p-2 rounded bg-ui-800 hover:bg-ui-700 text-ui-400 hover:text-ui-200 transition"
+            :title="theme === 'dark' ? t('header.themeToLight') : t('header.themeToDark')"
+          >
+            <!-- Static on purpose: lucide swaps this <i> for an <svg>, so a Vue
+                 binding would write to a node that is no longer in the document.
+                 applyTheme() sets the name on the rendered element instead. -->
+            <i data-theme-icon data-lucide="sun" class="w-4 h-4"></i>
+          </button>
+
+          <!-- Language. Shows the language it would switch to, not the current
+               one - the label is the action, like every other button here. -->
+          <button
+            @click="toggleLang"
+            class="px-2 py-2 rounded bg-ui-800 hover:bg-ui-700 text-ui-400 hover:text-ui-200 text-[11px] font-bold tracking-wider transition"
+            :title="t('header.langTitle')"
+            :aria-label="t('header.langTitle')"
+          >
+            {{ nextLangLabel }}
+          </button>
+
+          <button
+            @click="askConfirm('reset-all', resetAll)"
+            class="px-2.5 py-2 rounded text-xs font-medium flex items-center gap-1.5 transition"
+            :class="pendingConfirm === 'reset-all'
+              ? 'bg-warn-500/20 border border-warn-500/40 text-warn-300'
+              : 'bg-ui-800 hover:bg-ui-700 border border-transparent text-ui-400 hover:text-ui-200'"
+            :title="pendingConfirm === 'reset-all'
+              ? t('header.resetArmed')
+              : t('header.reset')"
+          >
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+            <span v-if="pendingConfirm === 'reset-all'">{{ t('header.resetConfirm') }}</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ============================================== -->
+      <!-- MAIN WORKSPACE LAYOUT                          -->
+      <!-- ============================================== -->
+      <div class="flex-1 flex flex-col lg:flex-row h-[calc(100vh-4rem)] overflow-hidden">
+
+        <!-- LEFT SIDEBAR -->
+        <aside class="w-full lg:w-[460px] border-r border-ui-800 bg-ui-900 flex h-full shrink-0 select-none z-20">
+
+          <!-- Menu: vertical tabs in a recessed rail. A tab is inset and rounded on
+               the left, and runs flush into the panel on the right, so it reads as
+               attached to the content rather than floating in the rail. Groups are
+               told apart by a gap. -->
+          <nav class="w-12 shrink-0 bg-rail py-2 flex flex-col items-stretch gap-0.5">
+            <template v-for="(group, index) in MENU_GROUPS" :key="group.id">
+              <div v-if="index" class="h-3.5" aria-hidden="true"></div>
+              <button
+                v-for="item in group.items"
+                :key="item.id"
+                @click="activeTab = item.id"
+                :title="menuGroupLabel(group) + ' \u2013 ' + menuItemLabel(item)"
+                :aria-label="menuItemLabel(item)"
+                :aria-current="activeTab === item.id ? 'page' : null"
+                class="h-9 ml-1.5 flex items-center justify-center rounded-l-md transition-colors"
+                :class="activeTab === item.id
+                  ? 'bg-ui-900 text-accent-400'
+                  : 'text-ui-500 hover:text-ui-200 hover:bg-ui-900/50'"
+              >
+                <svg
+                  class="w-[19px] h-[19px]"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ><use :href="'#i-' + item.icon" /></svg>
+              </button>
+            </template>
+          </nav>
+
+          <!-- Tab Content Scrollable Area -->
+          <div class="flex-1 min-w-0 overflow-y-auto p-4 space-y-5">
+
+            <div data-panel="workflow"></div>
+
+            <div data-panel="template"></div>
+
+            <div data-panel="colorset"></div>
+
+
+            <div data-panel="fontset"></div>
+
+            <div data-panel="products"></div>
+
+            <div data-panel="company"></div>
+
+            <div data-panel="export"></div>
+
+          </div>
+        </aside>
+
+        <!-- RIGHT PREVIEW STAGE -->
+        <div class="flex-1 flex flex-col h-full min-w-0 bg-ui-950 overflow-hidden">
+
+          <!-- Preview Toolbar -->
+          <div class="h-14 border-b border-ui-800 bg-ui-900/60 px-4 flex items-center justify-between gap-4 shrink-0 flex-wrap overflow-x-auto">
+
+            <!-- Format Pills -->
+            <div class="flex items-center gap-1.5 p-1 bg-ui-950/80 rounded-md border border-ui-800">
+              <button
+                v-for="fmt in SOCIAL_FORMATS"
+                :key="fmt.id"
+                @click="currentFormat = fmt"
+                class="px-3 py-1.5 rounded text-xs font-semibold flex items-center gap-2 transition"
+                :class="currentFormat.id === fmt.id ? 'bg-accent-600 text-white shadow-sm' : 'text-ui-400 hover:text-ui-200 hover:bg-ui-800/60'"
+              >
+                <span>{{ fmt.id }}</span>
+              </button>
+            </div>
+
+            <!-- Toolbar Tools -->
+            <div class="flex items-center gap-2">
+              <!-- Background Selector -->
+              <div class="flex items-center bg-ui-950/80 rounded-md border border-ui-800 p-1">
+                <button
+                  @click="bgMode = 'checkerboard-dark'"
+                  class="p-1.5 rounded transition"
+                  :class="bgMode === 'checkerboard-dark' ? 'bg-ui-800 text-accent-400' : 'text-ui-400 hover:text-ui-200'"
+                  :title="t('preview.bgCheckerDark')"
+                >
+                  <i data-lucide="grid-3x3" class="w-4 h-4"></i>
+                </button>
+                <button
+                  @click="bgMode = 'checkerboard-light'"
+                  class="p-1.5 rounded transition"
+                  :class="bgMode === 'checkerboard-light' ? 'bg-ui-800 text-accent-400' : 'text-ui-400 hover:text-ui-200'"
+                  :title="t('preview.bgCheckerLight')"
+                >
+                  <i data-lucide="sun" class="w-4 h-4"></i>
+                </button>
+                <button
+                  @click="bgMode = 'dark'"
+                  class="p-1.5 rounded transition"
+                  :class="bgMode === 'dark' ? 'bg-ui-800 text-accent-400' : 'text-ui-400 hover:text-ui-200'"
+                  :title="t('preview.bgBlack')"
+                >
+                  <i data-lucide="moon" class="w-4 h-4"></i>
+                </button>
+                <button
+                  @click="bgMode = 'light'"
+                  class="p-1.5 rounded transition"
+                  :class="bgMode === 'light' ? 'bg-ui-800 text-accent-400' : 'text-ui-400 hover:text-ui-200'"
+                  :title="t('preview.bgWhite')"
+                >
+                  <i data-lucide="square" class="w-4 h-4"></i>
+                </button>
+
+                <label
+                  class="p-1.5 rounded cursor-pointer transition flex items-center justify-center"
+                  :class="bgMode === 'custom' ? 'bg-accent-600 text-white' : 'text-ui-400 hover:text-ui-200'"
+                  :title="t('preview.bgUpload')"
+                >
+                  <i data-lucide="image" class="w-4 h-4"></i>
+                  <input type="file" accept="image/*" class="hidden" @change="handleBgUpload" />
+                </label>
+              </div>
+
+              <div v-if="bgMode === 'custom' && customBgUrl" class="flex items-center gap-1">
+                <button
+                  @click="resetBgView"
+                  class="px-2 py-1.5 rounded bg-ui-950/80 border border-ui-800 text-[11px] font-mono text-ui-300 hover:text-ui-100 transition"
+                  :title="t('preview.bgFraming')"
+                >
+                  {{ Math.round(bgZoom * 100) }}%
+                </button>
+                <button
+                  @click="removeCustomBg"
+                  class="p-1.5 text-xs text-danger-400 hover:text-danger-300 transition"
+                  :title="t('preview.bgRemove')"
+                >
+                  <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Preview Stage -->
+          <div class="flex-1 relative overflow-hidden bg-ui-950 select-none">
+
+            <div class="absolute top-4 left-6 px-3 py-1 rounded-full bg-ui-900/90 border border-ui-800 text-ui-400 text-xs font-mono flex items-center gap-2 pointer-events-none z-30 shadow">
+              <span class="w-2 h-2 rounded-full" :class="isPreviewLoading ? 'bg-warn-400 animate-pulse' : (templateError ? 'bg-danger-500' : 'bg-ok-400')"></span>
+              <span>{{ currentFormat.width }} &times; {{ currentFormat.height }} px</span>
+              <span class="text-ui-600">&bull;</span>
+              <span class="text-accent-400 font-bold">{{ currentFormat.id }}</span>
+            </div>
+
+            <div class="absolute top-4 right-6 px-3 py-1 rounded-full bg-ui-900/90 border border-ui-800 text-[11px] flex items-center gap-2 pointer-events-none z-30 shadow max-w-[60%]">
+              <span class="text-ui-300 font-semibold truncate">{{ activeProduct.title }}</span>
+              <span class="text-ui-600">/</span>
+              <span class="text-ui-400 truncate">{{ activeTemplate.name }}</span>
+              <span class="text-ui-600">/</span>
+              <span class="text-ui-400 truncate">{{ activeColorSet.name }}</span>
+            </div>
+
+            <!-- Measuring area for the scale (padding = margin around the preview) -->
+            <div ref="stageAreaRef" class="absolute inset-0 m-16 flex items-center justify-center">
+              <div
+                class="relative shrink-0 shadow-2xl rounded overflow-hidden border border-ui-800"
+                :style="{ width: currentFormat.width * previewScale + 'px', height: currentFormat.height * previewScale + 'px' }"
+                :class="{
+                  'transparency-grid': bgMode === 'checkerboard-dark',
+                  'transparency-grid-light': bgMode === 'checkerboard-light',
+                  'bg-[#0b0d10]': bgMode === 'dark',
+                  'bg-white': bgMode === 'light',
+                  'cursor-grab': bgMode === 'custom' && customBgUrl && !isBgDragging,
+                  'cursor-grabbing': isBgDragging
+                }"
+                @wheel="onBgWheel"
+                @pointerdown="onBgPointerDown"
+                @pointermove="onBgPointerMove"
+                @pointerup="onBgPointerUp"
+                @pointercancel="onBgPointerUp"
+                @dblclick="resetBgView"
+              >
+                <!-- Background image. It is exported underneath the overlay. bgView supplies
+                     the framing: drag to move,
+                     scroll to zoom, double-click to reset. It stays invisible
+                     until the image dimensions are known (onBgLoad). -->
+                <img
+                  v-if="bgMode === 'custom' && customBgUrl"
+                  :src="customBgUrl"
+                  @load="onBgLoad"
+                  alt="Background"
+                  class="absolute max-w-none pointer-events-none"
+                  :style="bgView
+                    ? {
+                        width: bgView.width + 'px',
+                        height: bgView.height + 'px',
+                        left: '50%',
+                        top: '50%',
+                        transform: 'translate(-50%, -50%) translate(' + bgView.x + 'px, ' + bgView.y + 'px)'
+                      }
+                    : { opacity: 0 }"
+                />
+
+                <!-- Template at original size, scaled into the preview by transform -->
+                <iframe
+                  ref="previewFrameRef"
+                  :title="t('preview.frameTitle')"
+                  class="absolute top-0 left-0 border-0 pointer-events-none z-10"
+                  :style="{
+                    width: currentFormat.width + 'px',
+                    height: currentFormat.height + 'px',
+                    transform: 'scale(' + previewScale + ')',
+                    transformOrigin: '0 0',
+                    background: 'transparent'
+                  }"
+                ></iframe>
+
+                <!-- Template failed to load -->
+                <div
+                  v-if="templateError"
+                  class="absolute inset-0 z-30 flex items-center justify-center p-6 bg-ui-950/90"
+                >
+                  <div class="max-w-md text-center space-y-2">
+                    <span class="text-sm font-bold text-danger-300 block">{{ t('preview.templateFailed') }}</span>
+                    <span class="text-xs text-ui-400 block leading-relaxed">{{ templateError }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Quick Export Bar -->
+          <div class="h-16 border-t border-ui-800 bg-ui-900/90 px-6 flex items-center justify-between gap-4 shrink-0">
+            <nav :aria-label="t('footer.nav')" class="text-xs text-ui-500 hidden sm:flex items-center gap-2 min-w-0">
+              <span class="whitespace-nowrap">{{ t('app.version', { version: appVersion }) }}</span>
+              <template v-for="link in footerLinks" :key="link.id">
+                <span aria-hidden="true" class="text-ui-700">|</span>
+                <a
+                  :href="link.href"
+                  :title="link.title"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-ui-200 underline decoration-ui-700 hover:decoration-ui-400 underline-offset-2 transition whitespace-nowrap"
+                >{{ link.label }}</a>
+              </template>
+            </nav>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+              <button
+                @click="exportSinglePNG"
+                :disabled="isExporting"
+                class="flex-1 sm:flex-initial px-4 py-2 rounded-md bg-ui-800 hover:bg-ui-700 disabled:opacity-50 text-ui-200 hover:text-ui-100 text-xs font-semibold border border-ui-700 flex items-center justify-center gap-2 transition shadow"
+              >
+                <i data-lucide="download" class="w-4 h-4 text-info-400"></i>
+                <span>PNG ({{ currentFormat.id }})</span>
+              </button>
+
+              <button
+                @click="exportZipPackage"
+                :disabled="isExporting"
+                class="flex-1 sm:flex-initial px-5 py-2 rounded-md bg-gradient-to-r from-accent-600 via-accent-500 to-info-500 hover:from-accent-500 hover:to-info-400 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-2 transition shadow-lg shadow-accent-500/25"
+              >
+                <i data-lucide="package-open" class="w-4 h-4 text-white"></i>
+                <span>{{ isExporting ? exportStatusText : 'ZIP (all formats)' }}</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Invisible stage for the export (original size, inside the viewport so the
+           browser does not throttle it; opacity does not reach into the iframe) -->
+      <iframe
+        ref="exportFrameRef"
+        :title="t('preview.exportFrameTitle')"
+        aria-hidden="true"
+        tabindex="-1"
+        class="fixed top-0 left-0 border-0 pointer-events-none"
+        style="opacity: 0; z-index: -1; width: 1080px; height: 1080px;"
+      ></iframe>
+
+      <!-- Import confirmation. An import replaces the whole setup, so what is in
+           the file is shown before anything of it is applied. -->
+      <div
+        v-if="pendingImport"
+        class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-ui-950/80 backdrop-blur-sm"
+        @click.self="cancelImport"
+      >
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="import-dialog-title"
+          class="w-full max-w-md rounded-lg bg-ui-900 border border-ui-700 shadow-2xl p-5 space-y-4"
+          @keydown.esc="cancelImport"
+        >
+          <div class="flex items-start gap-3">
+            <span class="mt-0.5 shrink-0 w-8 h-8 rounded-full bg-warn-500/15 border border-warn-500/40 flex items-center justify-center">
+              <i data-lucide="triangle-alert" class="w-4 h-4 text-warn-400"></i>
+            </span>
+            <div class="min-w-0">
+              <h2 id="import-dialog-title" class="text-sm font-bold text-ui-100">{{ t('import.heading') }}</h2>
+              <p class="text-[11px] text-ui-400 font-mono break-all mt-0.5">{{ pendingImport.fileName }}</p>
+            </div>
+          </div>
+
+          <p class="text-xs text-ui-300 leading-relaxed">
+            {{ t('import.warningBefore') }}<strong class="text-warn-300">{{ t('import.warningStrong') }}</strong>{{ t('import.warningAfter') }}
+          </p>
+
+          <div class="rounded-md bg-ui-950/80 border border-ui-800 p-3 space-y-2">
+            <div class="flex items-baseline justify-between gap-3 text-[11px]">
+              <span class="text-ui-500">{{ t('import.version') }}</span>
+              <span class="font-mono text-ui-200">{{ pendingImport.version }}</span>
+            </div>
+            <div class="flex items-baseline justify-between gap-3 text-[11px]">
+              <span class="text-ui-500 shrink-0">{{ t('import.contains') }}</span>
+              <span class="text-ui-300 text-right">
+                <template v-if="pendingImport.contains.length">
+                  {{ pendingImport.contains.map(setupAreaLabel).join(', ') }}
+                </template>
+                <template v-else>{{ t('import.containsNothing') }}</template>
+              </span>
+            </div>
+          </div>
+
+          <p v-if="pendingImport.warning" class="text-[11px] text-warn-300 leading-relaxed flex gap-2">
+            <i data-lucide="info" class="w-3.5 h-3.5 shrink-0 mt-px"></i>
+            <span>{{ pendingImport.warning }}</span>
+          </p>
+
+          <div class="flex items-center justify-end gap-2 pt-1">
+            <button
+              @click="cancelImport"
+              class="px-3 py-2 rounded text-xs font-medium bg-ui-800 hover:bg-ui-700 text-ui-300 hover:text-ui-100 border border-ui-700 transition"
+            >
+              {{ t('import.cancel') }}
+            </button>
+            <button
+              ref="importConfirmRef"
+              @click="confirmImport"
+              class="px-3 py-2 rounded text-xs font-semibold bg-warn-500/20 hover:bg-warn-500/30 text-warn-200 border border-warn-500/40 transition"
+            >
+              {{ t('import.confirm') }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toast Notification. The colour comes from toast.tone: green for done,
+           amber for an action that cannot run, red for a failure or a refusal. -->
+      <div
+        v-if="toast.visible"
+        role="status"
+        :aria-live="toast.tone === 'error' ? 'assertive' : 'polite'"
+        class="fixed bottom-6 right-6 z-50 max-w-sm px-4 py-3 rounded-md bg-ui-900 border shadow-2xl flex items-start gap-3 transition-all duration-300"
+        :class="toastStyle.box"
+      >
+        <span class="w-2.5 h-2.5 mt-1 shrink-0 rounded-full" :class="toastStyle.dot"></span>
+        <span class="text-xs font-medium leading-relaxed" :class="toastStyle.text">{{ toast.message }}</span>
+      </div>
+
+    </div>
+
+    <!-- Application Scripts -->
+    <script charset="UTF-8" src="i18n.js"></script>
+    <script charset="UTF-8" src="fonts.js"></script>
+    <script charset="UTF-8" src="constants.js"></script>
+    <script charset="UTF-8" src="renderer.js"></script>
+    <script charset="UTF-8" src="app.js"></script>
+  </body>
+</html>

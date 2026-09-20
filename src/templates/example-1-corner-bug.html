@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Example 1 &mdash; Corner Bug</title>
+  <meta name="description" content="Reduced to a station bug: company logo and name in the top right corner, slogan underneath. Uses no post content, so it stays readable over any footage.">
+  <meta name="category" content="Example">
+  <link rel="stylesheet" href="../fonts/fonts.css">
+  <style>
+    /* =====================================================================
+       VALUES COMING FROM THE APP
+       ---------------------------------------------------------------------
+       Opening this file directly uses the sample values below. Inside the app
+       they get overwritten:
+         --color-*       from the selected colour set
+         --font-<slot>   family, -weight and -axes per placeholder, from the font
+                         set and the mapping in the Template area. A namespaced
+                         slot loses its dot: company.name -> --font-company-name
+         data-format     "1:1" | "4:5" | "9:16" | "16:9" (plus width/height of .frame)
+
+       Every font declaration keeps its own value as the fallback, so the file
+       still looks right on its own. The `font:` shorthand is avoided throughout -
+       it resets font-variation-settings and would throw away the axis values of
+       a variation.
+       ===================================================================== */
+    .frame {
+      --color-background: #180c26;
+      --color-accent: #facc15;
+      --color-secondary: #c084fc;
+      --color-border: #a855f7;
+      --color-text: #ffffff;
+      --color-subtext: #e9d5ff;
+      --color-description: #c084fc;
+
+      --font-base: "Inter";
+    }
+
+    /* =====================================================================
+       THE DESIGN OF THIS TEMPLATE
+       ---------------------------------------------------------------------
+       Sizes are given in cqmin - a percent of the shorter side of the frame.
+       All four output formats are 1080 px on their short side, so 1cqmin is
+       10.8 px in every one of them and the bug comes out the same physical size
+       everywhere. That is what a station bug wants; the lower-third template
+       tunes its sizes per format instead, because there the type has to carry a
+       hierarchy that shifts between a wide and a narrow frame.
+       ===================================================================== */
+    .frame {
+      --fs-name: 2.4cqmin;
+      --fs-slogan: 1.5cqmin;
+
+      --margin: 4cqmin;      /* distance from the frame edges */
+      --gap: 1.4cqmin;       /* between logo and text */
+      --logo-size: 5.6cqmin;
+      --logo-radius: 1.2cqmin;
+
+      /* Backing plate. Set --plate-opacity to 0 for the bug on its own. */
+      --plate-opacity: 0%;
+      --plate-padding: 1.6cqmin;
+      --plate-radius: 1cqmin;
+
+      /* Hairline under the name, the only rule in this template */
+      --rule-weight: 1px;
+      --rule-color: color-mix(in srgb, var(--color-accent) 70%, transparent);
+
+      container-type: size;   /* makes cqmin relate to the frame */
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      font-family: var(--font-base), sans-serif;
+    }
+
+    /* 9:16 is held further from the top edge: in a vertical full-screen post
+       the upper ~12% sits under the status bar and the account row. */
+    .frame[data-format="9:16"] { --margin-top: 14cqmin; }
+
+    .bug {
+      position: absolute;
+      top: var(--margin-top, var(--margin));
+      right: var(--margin);
+      display: flex;
+      align-items: center;
+      gap: var(--gap);
+      padding: var(--plate-padding);
+      border-radius: var(--plate-radius);
+      background: color-mix(in srgb, var(--color-background) var(--plate-opacity), transparent);
+    }
+
+    .bug-logo {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      border-radius: var(--logo-radius);
+      object-fit: contain;
+      flex: none;
+    }
+
+    /* Right-aligned, so name and slogan share their right edge with the logo
+       column and the frame margin. */
+    .bug-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+      min-width: 0;
+    }
+
+    .bug-name {
+      font-family: var(--font-company-name, "Recursive"), sans-serif;
+      font-weight: var(--font-company-name-weight, 700);
+      font-variation-settings: var(--font-company-name-axes, normal);
+      font-size: var(--fs-name);
+      line-height: 1.15;
+      letter-spacing: 0.01em;
+      color: var(--color-text);
+      white-space: nowrap;
+    }
+
+    /* The rule only exists when a slogan follows it, so a bug without one does
+       not end on a dangling line. */
+    .bug-slogan {
+      margin-top: 0.5cqmin;
+      padding-top: 0.5cqmin;
+      border-top: var(--rule-weight) solid var(--rule-color);
+      font-family: var(--font-company-slogan, "Inter"), sans-serif;
+      font-weight: var(--font-company-slogan-weight, 400);
+      font-variation-settings: var(--font-company-slogan-axes, normal);
+      font-size: var(--fs-slogan);
+      line-height: 1.3;
+      color: var(--color-subtext);
+      white-space: nowrap;
+    }
+
+    /* Only for viewing this file directly; the app makes the background transparent */
+    body { margin: 0; background: #3b4a5c; }
+    [data-slot]:not(img):empty { display: none; }
+  </style>
+</head>
+<body>
+  <div class="frame" data-format="16:9">
+    <div class="bug">
+      <img class="bug-logo" data-slot="company.logo" alt="" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23facc15'/%3E%3C/svg%3E">
+      <div class="bug-text">
+        <div class="bug-name" data-slot="company.name">WASDCAT</div>
+        <div class="bug-slogan" data-slot="company.slogan">Level Up Your Media</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+/**
+ * WASDCAT Brand Kit Generator - Default Light
+ *
+ * The same slots as Default Dark, filled the other way round: the neutral scale
+ * is inverted, so high numbers stay the surfaces and low numbers stay the type.
+ * That is what lets both themes drive the identical markup.
+ *
+ * The signal colours are not simply inverted. Where a token carries type it gets
+ * darker so it reads on a pale surface; where it only tints a background (the
+ * 500s) it stays vivid.
+ *
+ * A theme is a stylesheet, not a form: it is edited here, never in the app.
+ */
+:root {
+  color-scheme: light;
+
+  /* Neutrals - paper and ink */
+  --ui-950: 255 255 255;   /* deepest surface: stage, sunken fields */
+  --ui-900: 247 248 250;   /* panel */
+  --ui-800: 226 230 235;   /* raised element, hairline border */
+  --ui-700: 206 212 220;   /* border on a raised element */
+  --ui-600: 166 175 187;
+  --ui-500: 122 131 146;   /* muted type */
+  --ui-400:  90  99 114;   /* secondary type */
+  --ui-300:  64  73  87;
+  --ui-200:  42  50  63;   /* body type */
+  --ui-100:  25  31  42;   /* headings, strongest type */
+
+  /* Accent - steel blue, darkened to carry white type and to read on paper */
+  --accent-600:  45 106 149;
+  --accent-500:  52 119 163;
+  --accent-400:  42  97 135;
+  --accent-300:  34  80 112;
+  --accent-200:  27  65  91;
+
+  /* Signals */
+  --warn-500:   217 119   6;
+  --warn-400:   161  98  10;
+  --warn-300:   146  64  14;
+  --warn-200:   120  53  15;
+
+  --danger-500: 239  68  68;
+  --danger-400: 190  30  45;
+  --danger-300: 159  18  30;
+  --danger-200: 127  29  29;
+
+  --ok-500:      16 185 129;
+  --ok-400:       4 120  87;
+  --ok-300:       6  95  70;
+  --ok-200:       6  78  59;
+
+  --info-500:     6 182 212;
+  --info-400:    14 116 144;
+
+  --rail: 221 226 233;    /* tab rail, recessed behind the panel */
+
+  /* Chrome that is not expressed through utility classes */
+  --scrollbar-thumb:       rgb(var(--ui-700));
+  --scrollbar-thumb-hover: rgb(var(--ui-600));
+  --swatch-border:         rgb(var(--ui-700));
+}

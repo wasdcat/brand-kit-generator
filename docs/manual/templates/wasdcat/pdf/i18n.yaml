@@ -1,0 +1,13 @@
+# =============================================================================
+# Ebene 3 der i18n-Kaskade: Texte fuer PDF des Themes "wasdcat".
+# =============================================================================
+
+"*":
+  studio_name: "WASDCAT Games"
+  studio_tagline: "Independent Game Studio"
+
+de:
+  classification: "Kennzeichnung"
+
+en:
+  classification: "Classification"

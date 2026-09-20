@@ -1,0 +1,151 @@
+<!--
+  AREA 3: COLOUR SET
+
+  A fragment of the app template, not a standalone page. index.html has a
+  <div data-panel="colorset"> placeholder that app.js replaces with this file
+  before Vue mounts, so everything here is compiled as part of the one root
+  component and binds against the same setup() scope.
+-->
+<!-- ====================================================== -->
+<!-- AREA 3: COLOUR SET                                     -->
+<!-- ====================================================== -->
+<div v-show="activeTab === 'colorset'" class="space-y-5">
+
+  <div class="space-y-2">
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-bold text-ui-200 uppercase tracking-wider">{{ t('cs.heading') }}</span>
+      <button
+        @click="createColorSet"
+        class="px-2.5 py-1 rounded bg-accent-600 hover:bg-accent-500 text-white text-[11px] font-medium flex items-center gap-1 transition"
+      >
+        <i data-lucide="copy-plus" class="w-3.5 h-3.5"></i>
+        <span>{{ t('common.duplicate') }}</span>
+      </button>
+    </div>
+
+    <select
+      v-model="editingColorSetId"
+      class="w-full bg-ui-950/80 border border-ui-700 text-ui-100 text-xs font-bold rounded-md px-3 py-2.5 focus:outline-none focus:border-accent-500 transition"
+    >
+      <option v-for="cs in colorSets" :key="cs.id" :value="cs.id">{{ cs.name }}</option>
+    </select>
+
+    <div class="flex items-center gap-2 pt-1">
+      <button
+        v-if="editingColorSetId !== selection.colorSetId"
+        @click="applyColorSetToSelection"
+        class="flex-1 px-3 py-2 rounded bg-accent-600 hover:bg-accent-500 text-white text-[11px] font-semibold transition flex items-center justify-center gap-1.5"
+      >
+        <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+        <span>{{ t('common.showInPreview') }}</span>
+      </button>
+      <span
+        v-else
+        class="flex-1 px-3 py-2 rounded bg-ok-500/10 border border-ok-500/30 text-ok-300 text-[11px] font-semibold text-center"
+      >
+        {{ t('common.activeInPreview') }}
+      </span>
+      <button
+        @click="askConfirm('reset-colorset', resetColorSet)"
+        class="px-3 py-2 rounded border text-[11px] font-medium transition"
+        :class="pendingConfirm === 'reset-colorset'
+          ? 'bg-warn-500/20 border-warn-500/40 text-warn-300'
+          : 'bg-ui-800 hover:bg-ui-700 border-ui-700 text-ui-300'"
+      >
+        {{ pendingConfirm === 'reset-colorset' ? t('common.sure') : t('common.reset') }}
+      </button>
+      <button
+        v-if="!isDefault(editingColorSet.id)"
+        @click="askConfirm('delete-colorset', () => deleteColorSet(editingColorSet.id))"
+        class="px-3 py-2 rounded border text-[11px] font-medium transition"
+        :class="pendingConfirm === 'delete-colorset'
+          ? 'bg-danger-500/25 border-danger-500/50 text-danger-200'
+          : 'bg-ui-800 hover:bg-danger-500/20 border-ui-700 hover:border-danger-500/40 text-danger-400'"
+      >
+        {{ pendingConfirm === 'delete-colorset' ? t('common.sure') : t('common.delete') }}
+      </button>
+    </div>
+  </div>
+
+  <div class="p-4 rounded-lg bg-ui-950/80 border border-ui-800 space-y-4">
+    <div>
+      <span class="text-[11px] text-ui-400 block mb-1">{{ t('cs.name') }}</span>
+      <input
+        type="text"
+        v-model="editingColorSet.name"
+        :readonly="isDefault(editingColorSet.id)"
+        :title="isDefault(editingColorSet.id) ? t('common.defaultLocked') : ''"
+        :placeholder="t('cs.phName')"
+        class="w-full border text-xs font-bold rounded-md px-3 py-2 focus:outline-none"
+        :class="isDefault(editingColorSet.id)
+          ? 'bg-ui-900 border-ui-800 text-ui-500 cursor-not-allowed'
+          : 'bg-ui-800 border-ui-700 text-ui-100 focus:border-accent-500'"
+      />
+    </div>
+
+    <div class="space-y-2">
+      <span class="text-[11px] font-bold text-ui-300 block">{{ t('cs.values') }}</span>
+      <div
+        v-for="role in COLOR_ROLES"
+        :key="role.key"
+        class="p-2.5 rounded bg-ui-900 border border-ui-800"
+      >
+        <div class="flex items-center gap-2.5">
+          <input
+            type="color"
+            v-model="editingColorSet.colors[role.key]"
+            class="w-8 h-8 rounded cursor-pointer shrink-0"
+          />
+          <div class="min-w-0 flex-1">
+            <span class="text-[11px] text-ui-200 font-medium block truncate">
+              {{ roleLabel(role.key) }}
+              <code class="ml-1 text-[10px] font-normal text-accent-300/80">--color-{{ role.key }}</code>
+            </span>
+            <span class="text-[10px] text-ui-500 block truncate">{{ roleHint(role.key) }}</span>
+          </div>
+          <input
+            type="text"
+            v-model="editingColorSet.colors[role.key]"
+            class="w-20 shrink-0 bg-ui-800 text-[10px] text-ui-200 font-mono px-2 py-1.5 rounded border border-ui-700 uppercase focus:outline-none focus:border-accent-500"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div v-if="editingColorSet.assign" class="space-y-2">
+      <span class="text-[11px] font-bold text-ui-300 block">{{ t('cs.assignment') }}</span>
+      <p class="text-[10px] text-ui-500 leading-relaxed">
+        Which of the colours above a design object uses &ndash; no extra colour, just a reference.
+      </p>
+      <div
+        v-for="item in COLOR_ASSIGNMENTS"
+        :key="item.key"
+        class="p-2.5 rounded bg-ui-900 border border-ui-800"
+      >
+        <div class="flex items-center gap-2.5">
+          <span
+            class="w-8 h-8 rounded border border-ui-700 shrink-0"
+            :style="{ backgroundColor: editingColorSet.colors[editingColorSet.assign[item.key]] }"
+          ></span>
+          <div class="min-w-0 flex-1">
+            <span class="text-[11px] text-ui-200 font-medium block truncate">
+              {{ assignLabel(item.key) }}
+              <code class="ml-1 text-[10px] font-normal text-accent-300/80">--{{ item.key }}-color</code>
+            </span>
+          </div>
+          <select
+            v-model="editingColorSet.assign[item.key]"
+            class="w-28 shrink-0 bg-ui-800 text-[10px] text-ui-200 px-2 py-1.5 rounded border border-ui-700 focus:outline-none focus:border-accent-500"
+          >
+            <option v-for="role in ASSIGNABLE_ROLES" :key="role.key" :value="role.key">{{ roleLabel(role.key) }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-[10px] text-ui-500 leading-relaxed px-1">
+    A colour set defines the colour values and maps them to individual design objects.
+    Everything else is decided by the CSS of the template.
+  </p>
+</div>
