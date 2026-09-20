@@ -188,7 +188,7 @@
               Brand Kit Generator
             </h1>
             <p class="text-[11px] text-ui-400">
-              by <a
+              {{ t('app.by') }} <a
                 href="https://www.wasdcat.com"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -200,7 +200,10 @@
 
         <!-- Quick Utility Buttons -->
         <div class="flex items-center gap-2">
-          <label class="px-3 py-1.5 rounded bg-ui-800 hover:bg-ui-700 text-ui-200 text-xs font-medium cursor-pointer border border-ui-700 flex items-center gap-1.5 transition">
+          <label
+            class="px-3 py-1.5 rounded bg-ui-800 hover:bg-ui-700 text-ui-200 text-xs font-medium cursor-pointer border border-ui-700 flex items-center gap-1.5 transition"
+            :title="t('header.loadTitle')"
+          >
             <i data-lucide="upload" class="w-3.5 h-3.5 text-ui-400"></i>
             <span class="hidden md:inline">{{ t('header.load') }}</span>
             <input type="file" accept=".json" class="hidden" @change="importConfigJson" />
@@ -379,13 +382,24 @@
                 </label>
               </div>
 
+              <!-- A setup was loaded that names a background but does not carry
+                   it. The framing is already in place and waiting for the file. -->
+              <div
+                v-if="awaitedBgName"
+                class="flex items-center gap-1.5 px-2 py-1 rounded bg-warn-500/10 border border-warn-500/40 text-[11px] text-warn-200 max-w-[16rem]"
+                :title="t('preview.bgExpectedTitle', { name: awaitedBgName })"
+              >
+                <i data-lucide="image-off" class="w-3.5 h-3.5 shrink-0"></i>
+                <span class="truncate">{{ awaitedBgName }}</span>
+              </div>
+
               <div v-if="bgMode === 'custom' && customBgUrl" class="flex items-center gap-1">
                 <button
                   @click="resetBgView"
                   class="px-2 py-1.5 rounded bg-ui-950/80 border border-ui-800 text-[11px] font-mono text-ui-300 hover:text-ui-100 transition"
                   :title="t('preview.bgFraming')"
                 >
-                  {{ Math.round(bgZoom * 100) }}%
+                  {{ Math.round(framing.zoom * 100) }}%
                 </button>
                 <button
                   @click="removeCustomBg"
@@ -519,7 +533,7 @@
                 class="flex-1 sm:flex-initial px-5 py-2 rounded-md bg-gradient-to-r from-accent-600 via-accent-500 to-info-500 hover:from-accent-500 hover:to-info-400 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-2 transition shadow-lg shadow-accent-500/25"
               >
                 <i data-lucide="package-open" class="w-4 h-4 text-white"></i>
-                <span>{{ isExporting ? exportStatusText : 'ZIP (all formats)' }}</span>
+                <span>{{ isExporting ? exportStatusText : t('ex.zipShort') }}</span>
               </button>
             </div>
           </div>
@@ -538,6 +552,106 @@
         class="fixed top-0 left-0 border-0 pointer-events-none"
         style="opacity: 0; z-index: -1; width: 1080px; height: 1080px;"
       ></iframe>
+
+      <!-- Import confirmation. An import replaces the whole setup, so what is in
+           the file is shown before anything of it is applied. -->
+      <div
+        v-if="pendingBgSwap"
+        class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-ui-950/80 backdrop-blur-sm"
+        @click.self="cancelBgSwap"
+      >
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="bgswap-dialog-title"
+          class="w-full max-w-md rounded-lg bg-ui-900 border border-ui-700 shadow-2xl p-5 space-y-4"
+          @keydown.esc="cancelBgSwap"
+        >
+          <div class="flex items-start gap-3">
+            <span class="mt-0.5 shrink-0 w-8 h-8 rounded-full bg-warn-500/15 border border-warn-500/40 flex items-center justify-center">
+              <i data-lucide="triangle-alert" class="w-4 h-4 text-warn-400"></i>
+            </span>
+            <h2 id="bgswap-dialog-title" class="text-sm font-bold text-ui-100 mt-1.5">{{ t('bgswap.heading') }}</h2>
+          </div>
+
+          <p class="text-xs text-ui-300 leading-relaxed">
+            {{ t('bgswap.explain', { expected: pendingBgSwap.expected, picked: pendingBgSwap.picked }) }}
+          </p>
+
+          <div class="rounded-md bg-ui-950/80 border border-ui-800 p-3 space-y-2">
+            <div class="flex items-baseline justify-between gap-3 text-[11px]">
+              <span class="text-ui-500 shrink-0">{{ t('bgswap.expected') }}</span>
+              <span class="font-mono text-ui-200 truncate">{{ pendingBgSwap.expected }}</span>
+            </div>
+            <div class="flex items-baseline justify-between gap-3 text-[11px]">
+              <span class="text-ui-500 shrink-0">{{ t('bgswap.picked') }}</span>
+              <span class="font-mono text-warn-300 truncate">{{ pendingBgSwap.picked }}</span>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-2">
+            <button
+              @click="cancelBgSwap"
+              class="px-4 py-2 rounded-md text-ui-300 hover:text-ui-100 text-xs font-semibold transition"
+            >{{ t('import.cancel') }}</button>
+            <button
+              @click="confirmBgSwap"
+              class="px-4 py-2 rounded-md bg-warn-500 hover:bg-warn-400 text-ui-950 text-xs font-bold transition"
+            >{{ t('bgswap.confirm') }}</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saving a setup: the background is the only part worth a question. -->
+      <div
+        v-if="pendingSave"
+        class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-ui-950/80 backdrop-blur-sm"
+        @click.self="cancelSave"
+      >
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="save-dialog-title"
+          class="w-full max-w-md rounded-lg bg-ui-900 border border-ui-700 shadow-2xl p-5 space-y-4"
+          @keydown.esc="cancelSave"
+        >
+          <div class="flex items-start gap-3">
+            <span class="mt-0.5 shrink-0 w-8 h-8 rounded-full bg-accent-600/15 border border-accent-500/40 flex items-center justify-center">
+              <i data-lucide="image" class="w-4 h-4 text-accent-400"></i>
+            </span>
+            <div class="min-w-0">
+              <h2 id="save-dialog-title" class="text-sm font-bold text-ui-100">{{ t('save.heading') }}</h2>
+              <p class="text-[11px] text-ui-400 font-mono break-all mt-0.5">{{ pendingSave.name }}</p>
+            </div>
+          </div>
+
+          <p class="text-xs text-ui-300 leading-relaxed">{{ t('save.explain') }}</p>
+
+          <div class="space-y-2">
+            <button
+              @click="confirmSave(true)"
+              class="w-full text-left px-3.5 py-2.5 rounded-md bg-accent-600 hover:bg-accent-500 text-white transition"
+            >
+              <span class="text-xs font-bold block">{{ t('save.withImage') }}</span>
+              <span class="text-[11px] text-white/70 block mt-0.5">{{ t('save.withImageHint') }}</span>
+            </button>
+            <button
+              @click="confirmSave(false)"
+              class="w-full text-left px-3.5 py-2.5 rounded-md bg-ui-800 hover:bg-ui-700 text-ui-100 border border-ui-700 transition"
+            >
+              <span class="text-xs font-bold block">{{ t('save.withoutImage') }}</span>
+              <span class="text-[11px] text-ui-400 block mt-0.5">{{ t('save.withoutImageHint') }}</span>
+            </button>
+          </div>
+
+          <div class="flex justify-end">
+            <button
+              @click="cancelSave"
+              class="px-4 py-2 rounded-md text-ui-300 hover:text-ui-100 text-xs font-semibold transition"
+            >{{ t('import.cancel') }}</button>
+          </div>
+        </div>
+      </div>
 
       <!-- Import confirmation. An import replaces the whole setup, so what is in
            the file is shown before anything of it is applied. -->
@@ -625,6 +739,7 @@
     <script charset="UTF-8" src="i18n.js"></script>
     <script charset="UTF-8" src="fonts.js"></script>
     <script charset="UTF-8" src="constants.js"></script>
+    <script charset="UTF-8" src="store.js"></script>
     <script charset="UTF-8" src="renderer.js"></script>
     <script charset="UTF-8" src="app.js"></script>
   </body>

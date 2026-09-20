@@ -40,7 +40,7 @@
   const CONFIG_VERSION = '1.0';
   const CONFIG_MAJOR = parseInt(CONFIG_VERSION, 10);
   // The areas a setup is made of, used to summarise a file before importing it.
-  const SETUP_KEYS = ['company', 'products', 'colorSets', 'fontSets', 'typography', 'content', 'selection', 'hiddenTemplates'];
+  const SETUP_KEYS = ['company', 'products', 'colorSets', 'fontSets', 'typography', 'content', 'selection', 'hiddenTemplates', 'background'];
   const SELECTION_KEYS = ['productId', 'templateId', 'colorSetId', 'fontSetId'];
 
   // Links in the bottom bar. Only the targets live here; the wording comes from
@@ -187,13 +187,28 @@
 
       const bgMode = ref('checkerboard-dark');
       const customBgUrl = ref(null);
-      // Framing of the background image. The offset is a fraction of the frame width
-      // and height rather than a pixel value, so the framing survives a change
-      // of window size and with it of previewScale.
-      const bgZoom = ref(1);
-      const bgOffset = reactive({ x: 0, y: 0 });
+      // Name of the file the background came from. A setup can be saved without
+      // the image itself, and then this is all that is left to ask for.
+      const bgName = ref('');
+      // Framing of the background image, one row per template and format.
+      //
+      // Both matter. A template decides where it puts its ink - a scrim along
+      // the bottom, a bug in a corner - and the picture is framed around that.
+      // A format decides the shape it is cut to, and a portrait crop of a
+      // landscape photograph sits nowhere near where the landscape crop sits.
+      //
+      // The offset is a fraction of the frame width and height rather than a
+      // pixel value, so a row survives a change of window size and with it of
+      // previewScale, and carries from the scaled preview to the full-size
+      // export untouched.
+      const bgFraming = reactive({});           // templateId -> formatId -> { x, y, zoom }
+      const DEFAULT_FRAMING = Object.freeze({ x: 0, y: 0, zoom: 1 });
       const bgNatural = reactive({ width: 0, height: 0 });
       const isBgDragging = ref(false);
+      // Set when an imported setup named a background but did not carry it. The
+      // framing is already in place, so the file that is picked next has to slot
+      // into it rather than reset it the way a fresh picture does.
+      const awaitedBgName = ref('');
 
       // UI
       const appVersion = APP_VERSION;
@@ -684,6 +699,35 @@
       const clamp = (value, lo, hi) => Math.min(hi, Math.max(lo, value));
 
       /**
+       * The stored framing for one template and format, without creating it.
+       * Reads go through here - including the export, which walks every format
+       * in turn and must read the row of the format it is rendering rather than
+       * the one the preview happens to be showing.
+       */
+      const framingFor = (templateId, formatId) =>
+        (bgFraming[templateId] || {})[formatId] || DEFAULT_FRAMING;
+
+      /** What the preview shows. */
+      const framing = computed(() =>
+        framingFor(selection.templateId, currentFormat.value.id));
+
+      /**
+       * The same row, ready to be written to. Creating it on the first drag
+       * rather than up front keeps the stored map to the combinations that were
+       * actually framed, instead of a row per template times format.
+       */
+      const editFraming = () => {
+        const perTemplate = bgFraming[selection.templateId] || (bgFraming[selection.templateId] = {});
+        const id = currentFormat.value.id;
+        return perTemplate[id] || (perTemplate[id] = { ...DEFAULT_FRAMING });
+      };
+
+      /** A different picture makes every framing meaningless. */
+      const resetAllFraming = () => {
+        for (const key of Object.keys(bgFraming)) delete bgFraming[key];
+      };
+
+      /**
        * Size of the background image in the preview and the room it has to be moved.
        * Zoom 1 fills the frame (like object-fit: cover); the overhang of the
        * longer side is exactly the distance the image can slide.
@@ -696,8 +740,8 @@
         const boxW = fmt.width * previewScale.value;
         const boxH = fmt.height * previewScale.value;
         const cover = Math.max(boxW / bgNatural.width, boxH / bgNatural.height);
-        const width = bgNatural.width * cover * bgZoom.value;
-        const height = bgNatural.height * cover * bgZoom.value;
+        const width = bgNatural.width * cover * framing.value.zoom;
+        const height = bgNatural.height * cover * framing.value.zoom;
         return {
           boxW, boxH, width, height,
           maxX: Math.max(0, (width - boxW) / 2) / boxW,
@@ -706,30 +750,39 @@
       });
 
       // What the markup uses: pixel values for the current preview. Clamping also
-      // happens here, so a format change does not discard the stored offset -
-      // switching back puts the image where it was.
+      // happens here, so a row saved under a wider zoom is read back inside the
+      // room the current one leaves, without being written down narrower.
       const bgView = computed(() => {
         const b = bgBounds.value;
         if (!b) return null;
+        const view = framing.value;
         return {
           width: b.width,
           height: b.height,
-          x: clamp(bgOffset.x, -b.maxX, b.maxX) * b.boxW,
-          y: clamp(bgOffset.y, -b.maxY, b.maxY) * b.boxH
+          x: clamp(view.x, -b.maxX, b.maxX) * b.boxW,
+          y: clamp(view.y, -b.maxY, b.maxY) * b.boxH
         };
       });
 
+      // Reads before it writes: this also runs when a picture finishes loading,
+      // and a combination nobody has framed should not gain a row of defaults
+      // just for having been looked at.
       const clampBgOffset = () => {
         const b = bgBounds.value;
         if (!b) return;
-        bgOffset.x = clamp(bgOffset.x, -b.maxX, b.maxX);
-        bgOffset.y = clamp(bgOffset.y, -b.maxY, b.maxY);
+        const view = framing.value;
+        const x = clamp(view.x, -b.maxX, b.maxX);
+        const y = clamp(view.y, -b.maxY, b.maxY);
+        if (x === view.x && y === view.y) return;
+        const row = editFraming();
+        row.x = x;
+        row.y = y;
       };
 
+      /** Back to the default framing for this template and format only. */
       const resetBgView = () => {
-        bgZoom.value = 1;
-        bgOffset.x = 0;
-        bgOffset.y = 0;
+        const perTemplate = bgFraming[selection.templateId];
+        if (perTemplate) delete perTemplate[currentFormat.value.id];
       };
 
       const hasCustomBg = () => bgMode.value === 'custom' && !!customBgUrl.value;
@@ -744,15 +797,16 @@
       const onBgWheel = (e) => {
         if (!hasCustomBg() || !bgBounds.value) return;
         e.preventDefault();
-        const next = clamp(bgZoom.value * (e.deltaY < 0 ? 1.12 : 1 / 1.12), 1, BG_ZOOM_MAX);
-        const factor = next / bgZoom.value;
+        const view = editFraming();
+        const next = clamp(view.zoom * (e.deltaY < 0 ? 1.12 : 1 / 1.12), 1, BG_ZOOM_MAX);
+        const factor = next / view.zoom;
         if (factor === 1) return;
         const rect = e.currentTarget.getBoundingClientRect();
         const cx = (e.clientX - rect.left) / rect.width - 0.5;
         const cy = (e.clientY - rect.top) / rect.height - 0.5;
-        bgOffset.x = cx - (cx - bgOffset.x) * factor;
-        bgOffset.y = cy - (cy - bgOffset.y) * factor;
-        bgZoom.value = next;
+        view.x = cx - (cx - view.x) * factor;
+        view.y = cy - (cy - view.y) * factor;
+        view.zoom = next;
         clampBgOffset();
       };
 
@@ -767,8 +821,9 @@
 
       const onBgPointerMove = (e) => {
         if (!bgDrag) return;
-        bgOffset.x += (e.clientX - bgDrag.x) / bgDrag.width;
-        bgOffset.y += (e.clientY - bgDrag.y) / bgDrag.height;
+        const view = editFraming();
+        view.x += (e.clientX - bgDrag.x) / bgDrag.width;
+        view.y += (e.clientY - bgDrag.y) / bgDrag.height;
         bgDrag.x = e.clientX;
         bgDrag.y = e.clientY;
         clampBgOffset();
@@ -781,22 +836,110 @@
         try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (err) { /* ignore */ }
       };
 
-      const handleBgUpload = (e) =>
-        readFileAsDataUrl(e, (url) => {
-          customBgUrl.value = url;
-          bgMode.value = 'custom';
+      /**
+       * Only ever a picture. The value ends up as the src of an image and is
+       * drawn into a canvas, and a setup is a file that can come from anywhere.
+       */
+      const isImageDataUrl = (value) =>
+        typeof value === 'string' && /^data:image\/[a-z0-9.+-]+[;,]/i.test(value);
+
+      /**
+       * Takes on a picture. A different one makes every framing meaningless, so
+       * they all go - unless an imported setup is waiting for exactly this file,
+       * in which case its framing is the reason the file was asked for.
+       */
+      const useBackground = (url, name, { keepFraming = false } = {}) => {
+        if (!isImageDataUrl(url)) {
+          showToast(t('msg.bgNotAnImage'), { tone: 'error' });
+          return false;
+        }
+        // The preview needs the natural size of the picture to place it, and
+        // that used to arrive only with the load event of the preview image.
+        // Setting the same picture again does not change the src and so fires
+        // no such event - while the size had already been cleared, which left
+        // the background in place but invisible. It is measured here instead,
+        // and the size is only dropped when the picture really is another one.
+        if (customBgUrl.value !== url) {
           bgNatural.width = 0;
           bgNatural.height = 0;
-          resetBgView();
-        });
+        }
+        customBgUrl.value = url;
+        bgName.value = name || '';
+        bgMode.value = 'custom';
+        if (!keepFraming) resetAllFraming();
+        measureBackground(url);
+        BKG_STORE.put(BKG_STORE.BACKGROUND, { dataUrl: url, name: bgName.value });
+        return true;
+      };
 
-      const removeCustomBg = () => {
+      /**
+       * Reads the natural size of a picture without going through the preview.
+       * A later picture wins: the check on the way out drops the answer to a
+       * measurement that has since been overtaken.
+       */
+      const measureBackground = (url) => {
+        loadImageFrom(url).then((img) => {
+          if (customBgUrl.value !== url) return;
+          bgNatural.width = img.naturalWidth;
+          bgNatural.height = img.naturalHeight;
+          clampBgOffset();
+        }).catch(() => { /* the toast for an unreadable picture is enough */ });
+      };
+
+      // File names are compared the way a file system does it, so the same
+      // picture coming back as HOLIDAY.PNG is still the same picture.
+      const sameFile = (one, other) =>
+        one.trim().toLowerCase() === other.trim().toLowerCase();
+
+      // A different picture is being picked while a setup is still waiting for
+      // the one it named. Its framing was measured against that picture and
+      // would go, so it is asked about rather than done.
+      const pendingBgSwap = ref(null);
+
+      const handleBgUpload = (e) => {
+        const file = e.target.files?.[0];
+        const expected = awaitedBgName.value;
+        const name = file ? file.name : '';
+        readFileAsDataUrl(e, (url) => {
+          if (expected && !sameFile(expected, name) && isImageDataUrl(url)) {
+            pendingBgSwap.value = { expected, picked: name, url };
+            return;
+          }
+          if (!useBackground(url, name, { keepFraming: !!expected })) return;
+          awaitedBgName.value = '';
+        });
+      };
+
+      const confirmBgSwap = () => {
+        const job = pendingBgSwap.value;
+        if (!job) return;
+        pendingBgSwap.value = null;
+        // Not keeping the framing is the whole point of the question.
+        if (useBackground(job.url, job.picked)) awaitedBgName.value = '';
+      };
+
+      const cancelBgSwap = () => { pendingBgSwap.value = null; };
+
+      /**
+       * Puts the background back to none.
+       *
+       * `forget` says whether the picture is dropped from the asset store as
+       * well. Taking it off the screen and throwing it away are the same thing
+       * everywhere but one place: at startup the stored setup names a picture
+       * it does not carry, and the store is where that picture is waiting.
+       */
+      const clearBackground = ({ forget }) => {
         customBgUrl.value = null;
+        bgName.value = '';
+        awaitedBgName.value = '';
         bgMode.value = 'checkerboard-dark';
         bgNatural.width = 0;
         bgNatural.height = 0;
-        resetBgView();
+        resetAllFraming();
+        if (forget) BKG_STORE.remove(BKG_STORE.BACKGROUND);
       };
+
+      const removeCustomBg = () => clearBackground({ forget: true });
 
       // -----------------------------------------------------------------------
       // Export
@@ -813,6 +956,13 @@
       };
 
       const slug = (str) => String(str || 'overlay').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || 'overlay';
+
+      /** The background inside a ZIP, named after what the data URL says it is. */
+      const backgroundFilename = () => {
+        const type = /^data:image\/([a-z0-9.+-]+)/i.exec(customBgUrl.value || '');
+        const ext = (type ? type[1] : 'png').replace('jpeg', 'jpg').replace('svg+xml', 'svg');
+        return `background.${ext}`;
+      };
 
       const buildFilename = (fmt) =>
         `${slug(activeProduct.value.title)}_${slug(activeTemplate.value.id)}_${slug(activeColorSet.value.name)}_${fmt.id.replace(':', 'x')}.png`;
@@ -844,9 +994,12 @@
             loadImageFrom(overlayUrl)
           ]);
 
+          // The framing of the format being rendered, not of the one on screen:
+          // a ZIP walks all four in turn while the preview stays where it is.
+          const view = framingFor(activeTemplate.value.id, fmt.id);
           const cover = Math.max(fmt.width / bg.naturalWidth, fmt.height / bg.naturalHeight);
-          const width = bg.naturalWidth * cover * bgZoom.value;
-          const height = bg.naturalHeight * cover * bgZoom.value;
+          const width = bg.naturalWidth * cover * view.zoom;
+          const height = bg.naturalHeight * cover * view.zoom;
           const maxX = Math.max(0, (width - fmt.width) / 2) / fmt.width;
           const maxY = Math.max(0, (height - fmt.height) / 2) / fmt.height;
 
@@ -856,8 +1009,8 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(
             bg,
-            (fmt.width - width) / 2 + clamp(bgOffset.x, -maxX, maxX) * fmt.width,
-            (fmt.height - height) / 2 + clamp(bgOffset.y, -maxY, maxY) * fmt.height,
+            (fmt.width - width) / 2 + clamp(view.x, -maxX, maxX) * fmt.width,
+            (fmt.height - height) / 2 + clamp(view.y, -maxY, maxY) * fmt.height,
             width,
             height
           );
@@ -886,7 +1039,7 @@
       const exportSinglePNG = async () => {
         if (isExporting.value) return;
         isExporting.value = true;
-        exportStatusText.value = 'Rendere PNG...';
+        exportStatusText.value = t('ex.statusPng');
         try {
           const fmt = currentFormat.value;
           const blob = await renderFormat(fmt);
@@ -902,7 +1055,28 @@
         }
       };
 
-      const buildSetupSnapshot = () => ({
+      /**
+       * The background as a setup carries it.
+       *
+       * The framing is a handful of numbers and always travels. The picture is
+       * megabytes and only travels when asked for: into an exported file when
+       * the save dialog says so, and never into localStorage, which is written
+       * as one string and would lose the entire setup rather than just the
+       * image (the picture itself lives in the asset store, see store.js).
+       *
+       * Without the picture the name is what is left. An import can then say
+       * which file the setup expects instead of silently coming up blank.
+       */
+      const backgroundSnapshot = ({ withImage }) => {
+        if (!hasCustomBg()) return null;
+        return {
+          name: bgName.value,
+          framing: clone(bgFraming),
+          image: withImage ? customBgUrl.value : undefined
+        };
+      };
+
+      const buildSetupSnapshot = ({ withImage = false } = {}) => ({
         id: CONFIG_ID,
         version: CONFIG_VERSION,
         exportedAt: new Date().toISOString(),
@@ -913,7 +1087,8 @@
         typography: clone(typography),
         content: clone(content),
         selection: clone(selection),
-        hiddenTemplates: clone(hiddenTemplates)
+        hiddenTemplates: clone(hiddenTemplates),
+        background: backgroundSnapshot({ withImage })
       });
 
       const exportZipPackage = async () => {
@@ -934,14 +1109,20 @@
 
           let count = 0;
           for (const fmt of targetFmts) {
-            exportStatusText.value = `Rendering ${fmt.id} (${count + 1}/${total})...`;
+            exportStatusText.value = t('ex.statusFormat', { format: fmt.id, index: count + 1, total });
             exportProgressPercent.value = Math.round((count / (total + 1)) * 100);
             folder.file(buildFilename(fmt), await renderFormat(fmt));
             count++;
           }
           folder.file('brand-setup.json', JSON.stringify(buildSetupSnapshot(), null, 2));
+          // The picture goes in as a file rather than as base64 inside the
+          // setup: a third smaller, and it can be looked at. The setup names it.
+          if (hasCustomBg()) {
+            const source = await fetch(customBgUrl.value);
+            folder.file(backgroundFilename(), await source.blob());
+          }
 
-          exportStatusText.value = 'Building ZIP package...';
+          exportStatusText.value = t('ex.statusZip');
           exportProgressPercent.value = Math.round((total / (total + 1)) * 100);
           const zipBlob = await zip.generateAsync({ type: 'blob' });
           exportProgressPercent.value = 100;
@@ -961,17 +1142,92 @@
       // -----------------------------------------------------------------------
       // Saving and loading a setup
       // -----------------------------------------------------------------------
-      const exportConfigJson = () => {
-        const blob = new Blob([JSON.stringify(buildSetupSnapshot(), null, 2)], { type: 'application/json' });
+      const writeSetupFile = (withImage) => {
+        const blob = new Blob([JSON.stringify(buildSetupSnapshot({ withImage }), null, 2)],
+          { type: 'application/json' });
         downloadBlob(blob, 'wasdcat_brandkit_config.json');
-        showToast(t('msg.configSaved'));
+        showToast(t(withImage ? 'msg.configSavedWithImage' : 'msg.configSaved'));
+      };
+
+      // Asked only when there is a background to decide about: with the picture
+      // the file is complete but runs to megabytes, without it stays small and
+      // names the file it expects instead. Everything else about a setup is text.
+      const pendingSave = ref(null);
+
+      const exportConfigJson = () => {
+        if (!hasCustomBg()) {
+          writeSetupFile(false);
+          return;
+        }
+        pendingSave.value = { name: bgName.value };
+      };
+
+      const confirmSave = (withImage) => {
+        pendingSave.value = null;
+        writeSetupFile(withImage);
+      };
+
+      const cancelSave = () => { pendingSave.value = null; };
+
+      /**
+       * Takes the framing rows out of a setup, one number at a time.
+       *
+       * A row is three numbers under a template and a format, and a file can
+       * come from anywhere, so nothing is copied across on trust. Rows for a
+       * format this build does not have are dropped; rows for a template it
+       * does not have are kept, because the catalogue is read from disk after
+       * the setup and a template that is merely switched off should find its
+       * framing again when it comes back.
+       */
+      const applyFraming = (rows) => {
+        resetAllFraming();
+        if (!rows || typeof rows !== 'object') return;
+        const formats = new Set(SOCIAL_FORMATS.map(f => f.id));
+        for (const [templateId, perTemplate] of Object.entries(rows)) {
+          if (!templateId || !perTemplate || typeof perTemplate !== 'object') continue;
+          for (const [formatId, row] of Object.entries(perTemplate)) {
+            if (!formats.has(formatId) || !row || typeof row !== 'object') continue;
+            const x = Number(row.x);
+            const y = Number(row.y);
+            const zoom = Number(row.zoom);
+            if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(zoom)) continue;
+            const target = bgFraming[templateId] || (bgFraming[templateId] = {});
+            target[formatId] = {
+              x: clamp(x, -1, 1),
+              y: clamp(y, -1, 1),
+              zoom: clamp(zoom, 1, BG_ZOOM_MAX)
+            };
+          }
+        }
+      };
+
+      /**
+       * The background of an imported setup. With the picture it is simply set;
+       * with only a name the framing is kept and the name is what the app asks
+       * for, because a browser cannot reopen a file by its path.
+       */
+      const applyBackground = (payload, { fromStorage }) => {
+        if (!payload || typeof payload !== 'object') {
+          clearBackground({ forget: !fromStorage });
+          return;
+        }
+        const name = typeof payload.name === 'string' ? payload.name : '';
+        if (isImageDataUrl(payload.image)) {
+          useBackground(payload.image, name, { keepFraming: true });
+          applyFraming(payload.framing);
+          awaitedBgName.value = '';
+          return;
+        }
+        clearBackground({ forget: !fromStorage });
+        applyFraming(payload.framing);
+        awaitedBgName.value = name;
       };
 
       // Reads a setup field by field rather than taking the object as it comes, so
       // a damaged or hand-edited file cannot put anything unexpected into the
       // state. The normalisers afterwards repair what is missing or dangling.
       // Callers check with identifySetup first.
-      const applySetup = (payload) => {
+      const applySetup = (payload, { fromStorage = false } = {}) => {
         if (!payload || typeof payload !== 'object') return false;
 
         if (payload.company) {
@@ -1026,6 +1282,11 @@
             if (typeof value === 'string' && value) selection[key] = value;
           }
         }
+        // An import replaces the whole setup, so a file that brings no
+        // background clears the one that is there rather than leaving it under
+        // someone else's design. A file from before 1.2.0 knows nothing about
+        // backgrounds and says so by having no key at all - that one is left alone.
+        if (payload.background !== undefined) applyBackground(payload.background, { fromStorage });
 
         normalizeProducts();
         normalizeColorSets();
@@ -1128,6 +1389,7 @@
 
       const resetAll = () => {
         try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+        removeCustomBg();
         hiddenTemplates.splice(0, hiddenTemplates.length);
         Object.assign(company, clone(DEFAULT_COMPANY));
         products.splice(0, products.length, ...clone(DEFAULT_PRODUCTS));
@@ -1260,6 +1522,20 @@
         saveStorage();
       };
 
+      /**
+       * Brings back the picture the stored setup expects. Asynchronous, so the
+       * app is already usable when it lands; until then the background is
+       * simply the one the setup names and does not have.
+       */
+      const restoreStoredBackground = () => {
+        if (!awaitedBgName.value) return;
+        BKG_STORE.get(BKG_STORE.BACKGROUND).then((saved) => {
+          if (!saved || !isImageDataUrl(saved.dataUrl) || !awaitedBgName.value) return;
+          useBackground(saved.dataUrl, saved.name || awaitedBgName.value, { keepFraming: true });
+          awaitedBgName.value = '';
+        });
+      };
+
       // Read once at startup. What is in the slot goes through the same check as an
       // imported file: the app writes it, but it is also the one piece of state
       // that can be edited from outside the app.
@@ -1268,7 +1544,7 @@
           const saved = localStorage.getItem(STORAGE_KEY);
           if (!saved) return;
           const payload = JSON.parse(saved);
-          if (identifySetup(payload).ok) applySetup(payload);
+          if (identifySetup(payload).ok) applySetup(payload, { fromStorage: true });
           else localStorage.removeItem(STORAGE_KEY);
         } catch (e) {
           try { localStorage.removeItem(STORAGE_KEY); } catch (e2) { /* ignore */ }
@@ -1285,7 +1561,10 @@
       let resizeObserver = null;
 
       const onGlobalKeydown = (e) => {
-        if (e.key === 'Escape' && pendingImport.value) cancelImport();
+        if (e.key !== 'Escape') return;
+        if (pendingImport.value) cancelImport();
+        else if (pendingSave.value) cancelSave();
+        else if (pendingBgSwap.value) cancelBgSwap();
       };
 
       onMounted(async () => {
@@ -1300,6 +1579,11 @@
         applyTheme();
 
         loadStorage();
+        // The setup in localStorage carries the framing and the name of the
+        // background but never the picture itself; that one is in the asset
+        // store. Restoring it keeps the framing that was just read - it was
+        // measured against this very picture.
+        restoreStoredBackground();
         // Also run on a first start, where loadStorage finds nothing and
         // applySetup never gets to normalise the defaults.
         normalizeProducts();
@@ -1332,7 +1616,8 @@
         if (confirmTimer) clearTimeout(confirmTimer);
       });
 
-      watch([company, products, colorSets, fontSets, typography, content, selection, currentFormat, hiddenTemplates], () => {
+      watch([company, products, colorSets, fontSets, typography, content, selection, currentFormat, hiddenTemplates,
+             bgFraming, bgMode, customBgUrl, bgName], () => {
         normalizeSelection();
         scheduleSave();
         schedulePreview();
@@ -1342,6 +1627,11 @@
       // A different font set may not know the variations the mapping points at
       watch(() => selection.fontSetId, () => normalizeTypography());
       watch(customBgUrl, () => nextTick(refreshIcons));
+      // The save dialog and the row naming a background that is still missing
+      // both bring an icon of their own, so lucide has to run once they exist
+      watch(pendingSave, () => nextTick(refreshIcons));
+      watch(pendingBgSwap, () => nextTick(refreshIcons));
+      watch(awaitedBgName, () => nextTick(refreshIcons));
       // The restore row appears and disappears with its own icon in it
       watch(() => removedTemplates.value.length, () => nextTick(refreshIcons));
       // The armed state swaps an icon for a label and back, so lucide has to run again
@@ -1377,7 +1667,13 @@
         isPreviewLoading,
         bgMode,
         customBgUrl,
-        bgZoom,
+        bgName,
+        framing,
+        awaitedBgName,
+        bgFraming,
+        editFraming,
+        useBackground,
+        flushSave,
         isBgDragging,
         activeTab,
         isExporting,
@@ -1451,6 +1747,9 @@
         deleteVariation,
         setVariationFont,
         handleBgUpload,
+        pendingBgSwap,
+        confirmBgSwap,
+        cancelBgSwap,
         removeCustomBg,
         onBgLoad,
         onBgWheel,
@@ -1461,6 +1760,9 @@
         exportSinglePNG,
         exportZipPackage,
         exportConfigJson,
+        pendingSave,
+        confirmSave,
+        cancelSave,
         importConfigJson,
         pendingImport,
         importConfirmRef,

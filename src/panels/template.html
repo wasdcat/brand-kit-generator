@@ -105,10 +105,7 @@
         {{ activeFontSet.name }} &rarr;
       </button>
     </div>
-    <p class="text-[10px] text-ui-500 leading-relaxed">
-      Which variation and which weight each placeholder uses. The size stays in the
-      CSS of the template &ndash; it is tuned per element and per format.
-    </p>
+    <p class="text-[10px] text-ui-500 leading-relaxed">{{ t('tp.typoNote') }}</p>
 
     <div v-if="typoRows.length" class="grid grid-cols-[1fr_7.5rem_3.5rem] gap-x-2 gap-y-1.5 items-center">
       <span class="text-[9px] text-ui-500 uppercase tracking-wider">{{ t('tp.colPlaceholder') }}</span>

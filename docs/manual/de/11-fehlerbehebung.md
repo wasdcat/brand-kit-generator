@@ -26,7 +26,7 @@ Wird die Anwendung direkt nach einer Aktualisierung des Projekts geöffnet, kann
 
 Der Browserspeicher ist voll; Ihre Einrichtung wurde **nicht** gespeichert.
 
-**Sofort:** *Save setup* in der Kopfzeile, um die Arbeit in eine Datei zu retten.
+**Sofort:** *Speichern* in der Kopfzeile, um die Arbeit in eine Datei zu retten.
 
 **Danach:** Nicht mehr benötigte Produkte löschen, besonders solche mit großem Logo. Logos als SVG statt als PNG hinterlegen — sie sind um ein Vielfaches kleiner.
 
@@ -60,7 +60,7 @@ Die Zuordnung im Bereich *Template* bietet nur Variationen aus dem **aktuell gew
 
 Die Datei trägt nicht die Kennung des Brand Kit Generators. Entweder stammt sie aus einem anderen Werkzeug, oder es ist gar keine Einrichtung — sondern etwa die `brand-setup.json` aus einem ZIP eines sehr alten Standes.
 
-**Lösung:** Eine Datei verwenden, die über *Save setup* dieser Anwendung entstanden ist.
+**Lösung:** Eine Datei verwenden, die über *Speichern* dieser Anwendung entstanden ist.
 
 ## Ein Template ist aus der Auswahl verschwunden
 
@@ -76,4 +76,4 @@ Die Anwendung richtet sich nach dem, was Ihr Browser meldet, und fällt auf Engl
 
 ## Nichts hilft
 
-Setzen Sie als letzten Schritt zurück — aber **sichern Sie vorher** über *Save setup*. Danach können Sie die Datei wieder laden und sehen, ob das Problem an der Einrichtung lag oder am Programmstand.
+Setzen Sie als letzten Schritt zurück — aber **sichern Sie vorher** über *Speichern*. Danach können Sie die Datei wieder laden und sehen, ob das Problem an der Einrichtung lag oder am Programmstand.

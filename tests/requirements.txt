@@ -1,0 +1,9 @@
+# Test dependencies. The application itself has none - it is plain HTML, CSS and
+# JavaScript with every library bundled under src/vendor.
+#
+#   python -m pip install -r tests/requirements.txt
+#   python -m playwright install --with-deps chromium
+#   python -m pytest
+pytest==8.4.2
+playwright==1.63.0
+pillow==12.3.0

@@ -92,9 +92,23 @@
       const clampsLine = style.textOverflow === 'ellipsis';
       if (!clampsLines && !clampsLine) continue;
 
+      // scrollHeight and scrollWidth report the overflow of the font's own
+      // ascent and descent, not of the visible glyphs. A line-height below the
+      // height of that box - 1.06 in the title card - therefore leaves a few
+      // pixels of overhang on every single line, whether or not anything is
+      // being cut off. Measured against a one-pixel tolerance every clamped
+      // element looks like it overflows, the search below then finds no length
+      // that fits (the overhang is the same for one character as for a hundred)
+      // and the text is put back unshortened - the ellipsis never appears.
+      // The tolerance has to swallow that overhang and stay under what one cut
+      // line adds, which half a line does in the block direction. Inline it is
+      // a slanted or swashed glyph that hangs over, well under a quarter em.
+      const fontSize = parseFloat(style.fontSize) || 0;
+      const lineHeight = parseFloat(style.lineHeight) || fontSize * 1.2;
+      const slack = clampsLines ? lineHeight / 2 : fontSize / 4;
       const overflows = () => (clampsLines
-        ? el.scrollHeight > el.clientHeight + 1
-        : el.scrollWidth > el.clientWidth + 1);
+        ? el.scrollHeight > el.clientHeight + slack
+        : el.scrollWidth > el.clientWidth + slack);
       if (!overflows()) continue;
 
       const original = el.textContent;

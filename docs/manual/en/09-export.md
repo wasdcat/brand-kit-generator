@@ -39,7 +39,7 @@ sample_show_overlays.zip
 
 Every ZIP carries the complete setup the images came from.
 
-That makes an export reproducible. Anyone needing those files again months later loads the enclosed JSON through *Load setup (JSON)* and stands exactly where you stood when you exported.
+That makes an export reproducible. Anyone needing those files again months later loads the enclosed JSON through *Load* and stands exactly where you stood when you exported.
 
 ## What differs from the preview
 

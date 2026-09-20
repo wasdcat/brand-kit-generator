@@ -59,7 +59,7 @@
   // in app.js). That one only moves when the format of the stored data changes,
   // which happens far less often than a release.
   // ---------------------------------------------------------------------------
-  const APP_VERSION = '1.1.1';
+  const APP_VERSION = '1.2.0';
 
   const DEFAULT_ID = 'default';
 

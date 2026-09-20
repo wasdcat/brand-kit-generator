@@ -169,14 +169,23 @@
       font-size: var(--fs-title);
       line-height: 1.2;
       color: var(--color-text);
-      /* Deliberately NOT line-clamped, unlike the lower third.
-         This box takes only the width it needs: it is positioned with `left`
-         but no `right`, so its width follows its content. The clamping the app
-         runs before an export shortens the text and measures again - and here
-         every shortening narrows the box, so the text keeps overflowing and the
-         search collapses the title to a bare ellipsis. A template whose box is
-         pinned on both sides (see lower-third.html) can clamp safely; this one
-         lets a long title wrap instead, bounded by --max-width. */
+      /* Deliberately NOT line-clamped, unlike the lower third: a long title
+         wraps and is held by --max-width instead of being cut off. The bar
+         grows with it, which is the point of this design.
+
+         What stood here until 1.1.2 was that this title could not be clamped
+         at all, because the box is positioned with `left` but no `right` and
+         so follows the width of its content: every shortening would narrow it,
+         the text would keep overflowing and the search would run down to a
+         bare ellipsis. That was a misreading of the export's overflow
+         measurement, which reported every clamped element as overflowing
+         whatever its text (see renderer.js). --max-width pins this box for any
+         title long enough to be cut, so a clamp here does shorten correctly -
+         the wrapping is a choice, not a workaround.
+
+         Worth checking before clamping a box with no bound on its width: that
+         one really does narrow with every shortening, leaving the search
+         nothing steady to measure against. */
       overflow-wrap: anywhere;
     }
 

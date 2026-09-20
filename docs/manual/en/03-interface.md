@@ -8,8 +8,8 @@ Five controls sit in the top right:
 
 | Control | Effect |
 | --- | --- |
-| **Load setup (JSON)** | Load a saved setup from a file |
-| **Save setup** | Download the current setup as a JSON file |
+| **Load** | Load a saved setup from a file |
+| **Save** | Download the current setup as a JSON file |
 | **Sun / moon** | Switch between the dark and light interface |
 | **DE / EN** | Switch the interface language |
 | **Circular arrow** | Reset everything to factory defaults |
@@ -68,10 +68,14 @@ Once an image is uploaded, its framing can be adjusted:
 - **Double-click**, or a click on the percentage, resets the framing
 - The **X** beside it removes the image
 
-The framing is stored as a fraction of the image area, not in pixels. Resize the window or switch format and the same part of the image stays in view.
+The framing is stored as a fraction of the image area, not in pixels. Resize the window and the same part of the image stays in view.
 
-> [!IMPORTANT] The background image is exported, but not saved
-> In the export it is drawn underneath the overlay, so the file is finished as it stands. It does not go into the saved setup — a photo at full size would blow the storage budget. After a reload it is gone.
+It is kept **per template and per format**, deliberately: a portrait crops a photo differently from a landscape, and a template that lays a scrim along the bottom needs a different part of the picture in frame than one with a bug in the corner. Frame each combination once and it stays that way.
+
+Resetting follows the same rule and only touches what is on screen. Load a **different picture** and every framing is dropped - each was measured against that one photo.
+
+> [!NOTE] The background image is kept
+> In the export it is drawn underneath the overlay, so the file is finished as it stands. Since 1.2.0 it also survives a reload, and it can be saved with the setup - see [Saving and moving](10-saving-and-moving.md).
 
 ### Badges
 

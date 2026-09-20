@@ -45,7 +45,7 @@ An SVG file is executable code. It can carry scripts, event handlers and referen
 For logos SVG is the better choice: scalable to any size at a tiny file size.
 
 > [!WARNING] Storage full
-> If the application reports *Browser storage is full*, your setup was **not** saved. Back it up immediately through *Save setup* and then remove products you no longer need, or particularly large logos.
+> If the application reports *Browser storage is full*, your setup was **not** saved. Back it up immediately through *Save* and then remove products you no longer need, or particularly large logos.
 
 ## Where the values end up
 

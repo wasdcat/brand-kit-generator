@@ -26,7 +26,7 @@ Opening the application right after the project was updated, the browser may sti
 
 Browser storage is full; your setup was **not** saved.
 
-**Right away:** *Save setup* in the header, to rescue your work into a file.
+**Right away:** *Save* in the header, to rescue your work into a file.
 
 **Then:** Delete products you no longer need, especially ones with a large logo. Store logos as SVG rather than PNG — they are many times smaller.
 
@@ -60,7 +60,7 @@ The mapping in the *Template* area only offers variations from the font set **cu
 
 The file does not carry the Brand Kit Generator's identifier. Either it comes from another tool, or it is not a setup at all — a `brand-setup.json` from a ZIP of a very old build, say.
 
-**Fix:** Use a file produced by *Save setup* of this application.
+**Fix:** Use a file produced by *Save* of this application.
 
 ## A template has vanished from the selector
 
@@ -76,4 +76,4 @@ The application follows what your browser reports and falls back to English.
 
 ## Nothing helps
 
-Reset as a last resort — but **save first** through *Save setup*. You can then load the file again and see whether the problem was in your setup or in the build.
+Reset as a last resort — but **save first** through *Save*. You can then load the file again and see whether the problem was in your setup or in the build.

@@ -39,7 +39,7 @@ beispielshow_overlays.zip
 
 Jedem ZIP liegt die vollständige Einrichtung bei, aus der die Bilder entstanden sind.
 
-Damit ist ein Export reproduzierbar. Wer die Dateien Monate später wieder braucht, lädt die beiliegende JSON über *Load setup (JSON)* und steht exakt dort, wo Sie beim Export standen.
+Damit ist ein Export reproduzierbar. Wer die Dateien Monate später wieder braucht, lädt die beiliegende JSON über *Laden* und steht exakt dort, wo Sie beim Export standen.
 
 ## Was im Export anders ist als in der Vorschau
 

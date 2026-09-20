@@ -8,6 +8,41 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tests/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tests/requirements.txt
+
+      # Saves the download, not the step: --with-deps still installs the system
+      # libraries. Keyed on the pinned Playwright version, so a version bump
+      # fetches a matching browser instead of reusing the old one.
+      - name: Cache the browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('tests/requirements.txt') }}
+
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+
+      - name: Run the tests
+        run: python -m pytest
+
   build-manuals:
     name: Build Manuals
     runs-on: ubuntu-latest
@@ -35,4 +70,3 @@ jobs:
           name: brand-kit-manuals
           path: src/docs/manual/*.pdf
           if-no-files-found: error
-

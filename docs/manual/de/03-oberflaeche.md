@@ -8,8 +8,8 @@ Oben rechts liegen fünf Bedienelemente:
 
 | Bedienelement | Wirkung |
 | --- | --- |
-| **Einrichtung laden (JSON)** | Eine gesicherte Einrichtung aus einer Datei laden |
-| **Einrichtung sichern** | Die aktuelle Einrichtung als JSON-Datei herunterladen |
+| **Laden** | Eine gesicherte Einrichtung aus einer Datei laden |
+| **Speichern** | Die aktuelle Einrichtung als JSON-Datei herunterladen |
 | **Sonne / Mond** | Zwischen dunkler und heller Oberfläche wechseln |
 | **DE / EN** | Sprache der Oberfläche wechseln |
 | **Pfeil im Kreis** | Alles auf die Werkseinstellung zurücksetzen |
@@ -68,10 +68,14 @@ Nach dem Hochladen eines Bildes lässt sich der Ausschnitt anpassen:
 - **Doppelklick** oder ein Klick auf die Prozentanzeige setzt den Ausschnitt zurück
 - Das **X** daneben entfernt das Bild
 
-Der Ausschnitt wird als Bruchteil der Bildfläche gespeichert, nicht in Pixeln. Wenn Sie das Fenster anders groß ziehen oder das Format wechseln, bleibt derselbe Bildausschnitt stehen.
+Der Ausschnitt wird als Bruchteil der Bildfläche gespeichert, nicht in Pixeln. Ziehen Sie das Fenster anders groß, bleibt derselbe Bildausschnitt stehen.
 
-> [!IMPORTANT] Das Hintergrundbild wird exportiert, aber nicht gespeichert
-> Im Export liegt es unter dem Overlay, die Datei ist damit fertig. In die gespeicherte Einrichtung wandert es nicht — ein Foto in voller Größe würde den Speicher sprengen. Nach einem Neuladen der Seite ist es wieder weg.
+Gemerkt wird er **je Template und Format**. Das ist Absicht: Ein Hochformat schneidet ein Foto anders zu als ein Querformat, und ein Template, das unten eine Abdunklung legt, braucht ein anderes Motiv im Bild als eines mit einem Zeichen in der Ecke. Sie rahmen jede Kombination einmal, und sie bleibt so.
+
+Zurücksetzen gilt entsprechend nur für das, was gerade auf dem Schirm ist. Laden Sie ein **anderes Bild**, werden alle Ausschnitte verworfen — sie waren an diesem einen Foto gemessen.
+
+> [!NOTE] Das Hintergrundbild bleibt erhalten
+> Im Export liegt es unter dem Overlay, die Datei ist damit fertig. Seit 1.2.0 übersteht es auch ein Neuladen der Seite, und es lässt sich mit der Einrichtung sichern — siehe [Sichern und übertragen](10-sichern-uebertragen.md).
 
 ### Plaketten
 
